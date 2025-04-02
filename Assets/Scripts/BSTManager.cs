@@ -1,30 +1,26 @@
 using UnityEngine;
 using System.Collections.Generic;
-
 public class BSTManager : MonoBehaviour
 {
-    [SerializeField] public GameObject nodePrefab; 
-    [SerializeField] public Transform treeContainer; 
+    public static BSTManager instance;  // Singleton reference
+    [SerializeField] public GameObject nodePrefab;
+    [SerializeField] public Transform treeContainer;
     private BSTNode root;
+    public Dictionary<int, GameObject> nodeObjects = new(); // Store nodes
 
-//testing insert
-    void Start()
-{
-    Insert(10);
-    Insert(5);
-    Insert(15);
-}
-
-
-    public BSTNode Search(int value)
+    void Awake()
     {
-        return SearchRecursive(root, value);
+        if (instance == null)
+            instance = this;  // Assign instance on awake
+        else
+            Destroy(gameObject);  // Prevent duplicate managers
     }
 
-    private BSTNode SearchRecursive(BSTNode node, int value)
+    void Start()
     {
-        if (node == null || node.Value == value) return node;
-        return value < node.Value ? SearchRecursive(node.Left, value) : SearchRecursive(node.Right, value);
+        Insert(10);
+        Insert(5);
+        Insert(15);
     }
 
     public void Insert(int value)
@@ -39,6 +35,7 @@ public class BSTManager : MonoBehaviour
         {
             GameObject newNode = Instantiate(nodePrefab, treeContainer);
             newNode.GetComponent<BSTNodeBehavior>().SetValue(value);
+            nodeObjects[value] = newNode; // Store reference to Unity object
             return new BSTNode(value);
         }
 
@@ -52,7 +49,6 @@ public class BSTManager : MonoBehaviour
 
     public void UpdateTree()
     {
-        // Call BSTVisualizer to reposition nodes
         treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
     }
 }

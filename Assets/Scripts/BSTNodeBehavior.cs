@@ -1,19 +1,30 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro; // Import TextMeshPro namespace
 
 public class BSTNodeBehavior : MonoBehaviour
 {
     public int Value { get; private set; }
-    private Text nodeText;
+    private TMP_Text nodeText; // Use TMP_Text instead of Text
 
     private void Awake()
     {
-        nodeText = GetComponentInChildren<Text>(); // Find the Text component
+        nodeText = GetComponentInChildren<TMP_Text>(); // Get the TextMeshPro component
+        if (nodeText == null)
+        {
+            Debug.LogError("TMP_Text component not found in BSTNodePrefab!");
+        }
     }
 
     public void SetValue(int value)
     {
         Value = value;
-        nodeText.text = value.ToString(); // Update text dynamically
+        if (nodeText != null)
+        {
+            nodeText.text = value.ToString(); // Update the text correctly
+        }
+        else
+        {
+            Debug.LogError("nodeText is null in BSTNodeBehavior! Check prefab setup.");
+        }
     }
 }

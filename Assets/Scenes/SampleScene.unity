@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a307f3e910d5c174385f5cccca70c969, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nodePrefab: {fileID: 903032610}
+  nodePrefab: {fileID: 0}
   treeContainer: {fileID: 1917260848}
 --- !u!4 &517439664
 Transform:
@@ -550,7 +550,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -960, y: -540, z: -0.072450064}
-  m_LocalScale: {x: 2.8393, y: 2.8393, z: 2.8393}
+  m_LocalScale: {x: 1.07, y: 1.07, z: 1.07}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 696534753}
@@ -833,8 +833,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcbab1e9b54afbc418c3672db77c3e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xSpacing: 50
-  ySpacing: 100
 --- !u!4 &1917260848
 Transform:
   m_ObjectHideFlags: 0

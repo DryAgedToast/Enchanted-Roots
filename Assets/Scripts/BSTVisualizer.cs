@@ -1,33 +1,28 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class BSTVisualizer : MonoBehaviour
 {
-    public float xSpacing = 50f; 
-    public float ySpacing = 100f;
+    private float xSpacing = 2.0f;
+    private float ySpacing = 2.5f;
 
     public void UpdatePositions(BSTNode root)
     {
         if (root == null) return;
-        PositionNodes(root, 0, 0, 0);
+        PositionNodes(root, 0, 0, xSpacing);
     }
 
-    private void PositionNodes(BSTNode node, float x, float y, int depth)
+    private void PositionNodes(BSTNode node, float x, float y, float spacing)
     {
         if (node == null) return;
 
-        // Find corresponding GameObject for node and set position
-        foreach (Transform child in transform)
+        // Move the corresponding GameObject in the scene
+        if (BSTManager.instance.nodeObjects.ContainsKey(node.Value))
         {
-            BSTNodeBehavior nodeBehavior = child.GetComponent<BSTNodeBehavior>();
-            if (nodeBehavior != null && nodeBehavior.Value == node.Value)
-            {
-                child.localPosition = new Vector3(x, y, 0);
-            }
+            BSTManager.instance.nodeObjects[node.Value].transform.position = new Vector3(x, y, 0);
         }
 
-        // Recursive positioning for left and right children
-        PositionNodes(node.Left, x - xSpacing / (depth + 1), y - ySpacing, depth + 1);
-        PositionNodes(node.Right, x + xSpacing / (depth + 1), y - ySpacing, depth + 1);
+        // Position left and right children
+        PositionNodes(node.Left, x - spacing, y - ySpacing, spacing / 1.5f);
+        PositionNodes(node.Right, x + spacing, y - ySpacing, spacing / 1.5f);
     }
 }
