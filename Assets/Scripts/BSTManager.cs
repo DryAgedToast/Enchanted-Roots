@@ -43,11 +43,17 @@ public class BSTManager : MonoBehaviour
         }
     }
 
-    public void Insert(int value)
+public void Insert(int value)
+{
+    root = InsertRecursive(root, value);
+    UpdateTree();
+
+    // Play the insert sound
+    if (SFXScript.instance != null)
     {
-        root = InsertRecursive(root, value);
-        UpdateTree();
+        SFXScript.instance.PlayInsertSound();
     }
+}
 
     private BSTNode InsertRecursive(BSTNode node, int value)
     {
