@@ -1,28 +1,25 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BSTVisualizer : MonoBehaviour
 {
-    private float xSpacing = 2.0f;
-    private float ySpacing = 2.5f;
+    public float xSpacing = 2.5f; // Horizontal spacing
+    public float ySpacing = 2.0f; // Vertical spacing
 
-    public void UpdatePositions(BSTNode root)
+    public void UpdatePositions(BSTNode root, float x = 0, float y = 0, int depth = 0)
     {
         if (root == null) return;
-        PositionNodes(root, 0, 0, xSpacing);
-    }
 
-    private void PositionNodes(BSTNode node, float x, float y, float spacing)
-    {
-        if (node == null) return;
-
-        // Move the corresponding GameObject in the scene
-        if (BSTManager.instance.nodeObjects.ContainsKey(node.Value))
+        Vector3 position = new Vector3(x, y, 0);
+        if (BSTManager.instance.nodeObjects.TryGetValue(root.Value, out GameObject nodeObj))
         {
-            BSTManager.instance.nodeObjects[node.Value].transform.position = new Vector3(x, y, 0);
+            nodeObj.transform.position = position;
         }
 
-        // Position left and right children
-        PositionNodes(node.Left, x - spacing, y - ySpacing, spacing / 1.5f);
-        PositionNodes(node.Right, x + spacing, y - ySpacing, spacing / 1.5f);
+        // Recursive positioning for left and right children
+        UpdatePositions(root.Left, x - xSpacing / (depth + 1), y - ySpacing, depth + 1);
+        UpdatePositions(root.Right, x + xSpacing / (depth + 1), y - ySpacing, depth + 1);
     }
+
+    
 }

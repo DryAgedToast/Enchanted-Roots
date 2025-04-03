@@ -1,19 +1,25 @@
 using UnityEngine;
+using TMPro;
 using System.Collections.Generic;
+
 public class BSTManager : MonoBehaviour
 {
-    public static BSTManager instance;  // Singleton reference
-    [SerializeField] public GameObject nodePrefab;
-    [SerializeField] public Transform treeContainer;
-    private BSTNode root;
-    public Dictionary<int, GameObject> nodeObjects = new(); // Store nodes
+    public static BSTManager instance;
 
-    void Awake()
+    [SerializeField] private GameObject nodePrefab;  // Prefab for BST Nodes
+    [SerializeField] private Transform treeContainer; // Parent transform for nodes
+    [SerializeField] private TMP_InputField inputField; // UI Input Field
+    [SerializeField] private TMP_Text traversalText; // UI Text for traversal output
+
+    private BSTNode root;
+    public Dictionary<int, GameObject> nodeObjects = new(); // Store node GameObjects
+
+    private void Awake()
     {
         if (instance == null)
-            instance = this;  // Assign instance on awake
+            instance = this;
         else
-            Destroy(gameObject);  // Prevent duplicate managers
+            Destroy(gameObject);
     }
 
     void Start()
@@ -21,6 +27,20 @@ public class BSTManager : MonoBehaviour
         Insert(10);
         Insert(5);
         Insert(15);
+        UpdateTree();
+    }
+
+    public void InsertFromUI()
+    {
+        if (int.TryParse(inputField.text, out int value))
+        {
+            Insert(value);
+            inputField.text = ""; // Clear input field
+        }
+        else
+        {
+            Debug.LogError("Invalid input! Please enter a number.");
+        }
     }
 
     public void Insert(int value)
@@ -50,5 +70,20 @@ public class BSTManager : MonoBehaviour
     public void UpdateTree()
     {
         treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
+    }
+
+    public void ShowInorderTraversal()
+    {
+        List<int> values = new();
+        InorderTraversal(root, values);
+        traversalText.text = "Inorder: " + string.Join(", ", values);
+    }
+
+    private void InorderTraversal(BSTNode node, List<int> values)
+    {
+        if (node == null) return;
+        InorderTraversal(node.Left, values);
+        values.Add(node.Value);
+        InorderTraversal(node.Right, values);
     }
 }
