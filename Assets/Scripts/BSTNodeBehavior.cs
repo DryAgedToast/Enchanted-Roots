@@ -11,7 +11,7 @@ public class BSTNodeBehavior : MonoBehaviour
         nodeText = GetComponentInChildren<TMP_Text>(); // Get the TextMeshPro component
         if (nodeText == null)
         {
-            Debug.LogError("TMP_Text component not found in BSTNodePrefab!");
+            Debug.LogError("TMP_Text component not found");
         }
     }
 
@@ -24,7 +24,7 @@ public class BSTNodeBehavior : MonoBehaviour
         }
         else
         {
-            Debug.LogError("nodeText is null in BSTNodeBehavior! Check prefab setup.");
+            Debug.LogError("nodeText is null in BSTNodeBehavior");
         }
     }
 }
