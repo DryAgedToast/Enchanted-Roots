@@ -3,6 +3,8 @@ using TMPro;
 
 public class BSTNodeBehavior : MonoBehaviour
 {
+    //this code is responsible for editing the TextMeshPro object on the node (displays node value), and not really anything more than that
+    
     public int Value { get; private set; }
     private TMP_Text nodeText;
 
