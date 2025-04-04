@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 7423a047db6adc94ba7a0cdf7cf65dcc
+guid: b3993a3528d9a4c18a68155b8e5a47b8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3237074208205913137
-    second: enchantedroots_0
+      213: 3045542753197080145
+    second: pngimg.com - tree_PNG92768_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,30 +96,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: enchantedroots_0
+      name: pngimg.com - tree_PNG92768_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1920
-        height: 1080
+        width: 468
+        height: 597
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fc3ce4c882a9313d0800000000000000
-      internalID: -3237074208205913137
+      spriteID: 15eb3908ff0f34a20800000000000000
+      internalID: 3045542753197080145
       vertices: []
       indices: 
       edges: []
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      enchantedroots_0: -3237074208205913137
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

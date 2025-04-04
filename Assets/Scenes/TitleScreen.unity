@@ -261,9 +261,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 497e1d4222a40e642af11c3dd1a7de49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSource: {fileID: 0}
-  loopStartSamples: 0
-  loopEndSamples: 0
 --- !u!1 &212144711
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab0c9812744d114ea890d2b3c33d724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelName: SampleScene
+  LevelName: LevelSelect
 --- !u!114 &212144714
 MonoBehaviour:
   m_ObjectHideFlags: 0
