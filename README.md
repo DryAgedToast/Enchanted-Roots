@@ -1,4 +1,4 @@
-# Game Name
+# Enchanted Roots
 
 ## Description of Game
 Enchanted Roots is a point and click game designed to teach the player how to analyze and traverse binary search trees using search, insert, and delete actions. 
