@@ -123,7 +123,8 @@ Must locate the invasive node (search), kill it (remove) and make sure the tree 
 
 ## Storyboarding
 
-
+![Storyboard 1](../Assets/StoryBoard1.jpg)
+![Storyboard 2](../Assets/ConceptArt.jpg)
 
 # Assets Needed
 
@@ -136,11 +137,8 @@ The game will include hand-drawn cutscenes, extensive lore of the forest and why
 ## Graphical
 
 - Characters List
-  - Small Cat
-  - Bee
-- Environment Art/Textures:
-  - *Environment Texture 1*
-  - *Environment Texture 2*
+  - Small Cat: ![Small Cat](../Assets/CatChar.png)
+  - Bee: ![Bee](../Assets/BeeChar.png)
 
 ## Audio
 
