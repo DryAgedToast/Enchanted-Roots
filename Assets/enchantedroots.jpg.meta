@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      enchantedroots_0: -3237074208205913137
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
