@@ -21,7 +21,10 @@ public class BSTManager : MonoBehaviour
     [SerializeField] private GameObject nodePrefab;  // prefab for BST Nodes
     [SerializeField] private Transform treeContainer; // parent transform for nodes
     [SerializeField] private TMP_InputField inputField; // UI Input Field (this is the text input field you'll see at the UI)
-    [SerializeField] private TMP_Text traversalText; // UI Text for traversal output (w.i.p., not completed yet)
+
+    // [SerializeField] private TMP_Text traversalText; // UI Text for traversal output (w.i.p., not completed yet)
+
+    [SerializeField] private TMP_Text scoreText; //UI Text for the # of lives the player has
 
     private BSTNode root;
     public Dictionary<int, GameObject> nodeObjects = new(); // store node GameObjects
@@ -45,6 +48,7 @@ public class BSTManager : MonoBehaviour
         Insert(5);
         Insert(15);
         UpdateTree();
+        scoreText.text = "Lives: " + (maxMistakes - mistakeCount);
     }
 
     // method responsible for inserting nodes based on text input on the UI
@@ -111,22 +115,35 @@ public class BSTManager : MonoBehaviour
         treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
     }
 
-    // w.i.p. method used to demonstrate traversals
-    public void ShowInorderTraversal()
-    {
-        List<int> values = new();
-        InorderTraversal(root, values);
-        traversalText.text = "Inorder: " + string.Join(", ", values);
+    //updates lives
+    public void UpdateLives(){
+        if ((maxMistakes - mistakeCount) > 0){
+            scoreText.text = "Lives: " + (maxMistakes - mistakeCount);
+        }
+        else
+        {
+            scoreText.text = "Game Over!";
+        }
+        
+
     }
 
-    // w.i.p. method used to demonstrate traversals
-    private void InorderTraversal(BSTNode node, List<int> values)
-    {
-        if (node == null) return;
-        InorderTraversal(node.Left, values);
-        values.Add(node.Value);
-        InorderTraversal(node.Right, values);
-    }
+    // // w.i.p. method used to demonstrate traversals
+    // public void ShowInorderTraversal()
+    // {
+    //     List<int> values = new();
+    //     InorderTraversal(root, values);
+    //     traversalText.text = "Inorder: " + string.Join(", ", values);
+    // }
+
+    // // w.i.p. method used to demonstrate traversals
+    // private void InorderTraversal(BSTNode node, List<int> values)
+    // {
+    //     if (node == null) return;
+    //     InorderTraversal(node.Left, values);
+    //     values.Add(node.Value);
+    //     InorderTraversal(node.Right, values);
+    // }
 
     // method used when the player clicks a node to attempt deletion
     public void AttemptDeleteNode(BSTNodeBehavior nodeBehavior)
@@ -136,19 +153,19 @@ public class BSTManager : MonoBehaviour
             // deleted the invasive node
             Debug.Log("Invasive node deleted. :)");
 
-            // 1. Remove node from dictionary
+            // 1. remove node from dictionary
             if (nodeObjects.ContainsKey(nodeBehavior.Value))
             {
                 nodeObjects.Remove(nodeBehavior.Value);
             }
 
-            // 2. Remove node from BST structure
+            // 2. remove node from BST structure
             root = DeleteRecursive(root, nodeBehavior.Value);
 
-            // 3. Destroy the visual GameObject
+            // 3. destroy the visual GameObject
             Destroy(nodeBehavior.gameObject);
 
-            // 4. Update tree layout after deletion
+            // 4. update tree layout after deletion
             UpdateTree();
 
             // play the insert sound (until you get a successfully deleted sound or something)
@@ -162,6 +179,7 @@ public class BSTManager : MonoBehaviour
             // deleted a healthy node
             Debug.Log("Healthy node deleted. :(");
             mistakeCount++;
+            UpdateLives();
             if (mistakeCount >= maxMistakes)
             {
                 Debug.Log("Game Over.");
@@ -186,11 +204,11 @@ public class BSTManager : MonoBehaviour
         }
         else
         {
-            // Node found
+            //node found
             if (node.Left == null) return node.Right;
             if (node.Right == null) return node.Left;
 
-            // Node with two children: get the inorder successor (smallest in the right subtree)
+            //node with two children: get the inorder successor (smallest in the right subtree)
             BSTNode temp = FindMin(node.Right);
             node.Value = temp.Value;
             node.Right = DeleteRecursive(node.Right, temp.Value);
@@ -198,7 +216,7 @@ public class BSTManager : MonoBehaviour
         return node;
     }
 
-    // helper method to find the minimum value node in a subtree
+    //helper method to find the minimum value node in a subtree
     private BSTNode FindMin(BSTNode node)
     {
         while (node.Left != null)
