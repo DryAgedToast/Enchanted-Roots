@@ -50,7 +50,9 @@ public class BSTManager : MonoBehaviour
 //This is the insert method used for the BST
 public void Insert(int value)
 {
+    //from the root, begin the traversal process for inserting a node
     root = InsertRecursive(root, value);
+    //update the tree after insertion to show the newly inserted node
     UpdateTree();
 
     // Play the insert sound
