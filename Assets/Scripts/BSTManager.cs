@@ -52,6 +52,9 @@ public class BSTManager : MonoBehaviour
         Insert(15);
         UpdateTree();
         scoreText.text = "";
+        heart1.SetActive(true);
+        heart2.SetActive(true);
+        heart3.SetActive(true);
     }
 
     // method responsible for inserting nodes based on text input on the UI
