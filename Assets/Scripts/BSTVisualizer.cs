@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class BSTVisualizer : MonoBehaviour
 {
+    //this script is responsible for deciding how far away the nodes get positioned when instantiated on the tree
+
     public float xSpacing = 2.5f; // Horizontal spacing
     public float ySpacing = 2.0f; // Vertical spacing
 
