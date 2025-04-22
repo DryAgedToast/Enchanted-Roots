@@ -531,7 +531,7 @@ MonoBehaviour:
   nodePrefab: {fileID: 7318434673616142976, guid: a5996a199f4220849a958a7a513a14f0, type: 3}
   treeContainer: {fileID: 1917260848}
   inputField: {fileID: 1477217190}
-  traversalText: {fileID: 52317512}
+  scoreText: {fileID: 1961571527}
 --- !u!4 &517439664
 Transform:
   m_ObjectHideFlags: 0
