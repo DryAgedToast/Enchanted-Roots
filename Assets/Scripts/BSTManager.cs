@@ -14,18 +14,6 @@ method
 
 */
 
-/*
-
-IMPORTANT:
-
-currently, for testing purposes, the invasive node has a 40% chance of spawning
-
-this is in the 
-private BSTNode InsertRecursive(BSTNode node, int value)
-method
-
-*/
-
 public class BSTManager : MonoBehaviour
 {
     public static BSTManager instance;
@@ -43,14 +31,9 @@ public class BSTManager : MonoBehaviour
 
     private int mistakeCount = 0;
     private int maxMistakes = 3;
-    public Dictionary<int, GameObject> nodeObjects = new(); // store node GameObjects
-
-    private int mistakeCount = 0;
-    private int maxMistakes = 3;
 
     private void Awake()
     {
-        // checks if manager instance exists
         // checks if manager instance exists
         if (instance == null)
             instance = this;
@@ -61,25 +44,19 @@ public class BSTManager : MonoBehaviour
     void Start()
     {
         // inserts 3 nodes for demo purposes
-        // inserts 3 nodes for demo purposes
         Insert(10);
         Insert(5);
         Insert(15);
         UpdateTree();
-        scoreText.text = "";
-        heart1.SetActive(true);
-        heart2.SetActive(true);
-        heart3.SetActive(true);
+        scoreText.text = "Lives: " + (maxMistakes - mistakeCount);
     }
 
-    // method responsible for inserting nodes based on text input on the UI
     // method responsible for inserting nodes based on text input on the UI
     public void InsertFromUI()
     {
         if (int.TryParse(inputField.text, out int value))
         {
             Insert(value);
-            inputField.text = ""; // clear input field
             inputField.text = ""; // clear input field
         }
         else
@@ -95,13 +72,6 @@ public class BSTManager : MonoBehaviour
         root = InsertRecursive(root, value);
         // update the tree after insertion to show the newly inserted node
         UpdateTree();
-    // this is the insert method used for the BST
-    public void Insert(int value)
-    {
-        // from the root, begin the traversal process for inserting a node
-        root = InsertRecursive(root, value);
-        // update the tree after insertion to show the newly inserted node
-        UpdateTree();
 
         // play the insert sound
         if (SFXScript.instance != null)
@@ -109,18 +79,10 @@ public class BSTManager : MonoBehaviour
             SFXScript.instance.PlayInsertSound();
         }
     }
-        // play the insert sound
-        if (SFXScript.instance != null)
-        {
-            SFXScript.instance.PlayInsertSound();
-        }
-    }
 
-    // method that uses recursion to traverse the BST and insert the node
     // method that uses recursion to traverse the BST and insert the node
     private BSTNode InsertRecursive(BSTNode node, int value)
     {
-        // if node does not exist, instantiate a new node and assign the value described in the parameters to said node
         // if node does not exist, instantiate a new node and assign the value described in the parameters to said node
         if (node == null)
         {
@@ -134,23 +96,12 @@ public class BSTManager : MonoBehaviour
             nodeBehavior.SetInvasive(makeInvasive);
 
             nodeObjects[value] = newNode;
-            var nodeBehavior = newNode.GetComponent<BSTNodeBehavior>();
-
-            nodeBehavior.SetValue(value);
-
-            // 40% chance a node is invasive
-            bool makeInvasive = Random.value < 0.4f;
-            nodeBehavior.SetInvasive(makeInvasive);
-
-            nodeObjects[value] = newNode;
             return new BSTNode(value);
         }
 
         // if value to be inserted is less than node value, insert left
-        // if value to be inserted is less than node value, insert left
         if (value < node.Value)
             node.Left = InsertRecursive(node.Left, value);
-        // else, if value to be inserted is greater than or equal to node value, insert right
         // else, if value to be inserted is greater than or equal to node value, insert right
         else
             node.Right = InsertRecursive(node.Right, value);
@@ -159,28 +110,40 @@ public class BSTManager : MonoBehaviour
     }
 
     // method used to spawn and update the positions of the BST. called after every insert to ensure nodes are properly displayed
-    // method used to spawn and update the positions of the BST. called after every insert to ensure nodes are properly displayed
     public void UpdateTree()
     {
         treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
     }
 
-    // w.i.p. method used to demonstrate traversals
-    public void ShowInorderTraversal()
-    {
-        List<int> values = new();
-        InorderTraversal(root, values);
-        traversalText.text = "Inorder: " + string.Join(", ", values);
+    //updates lives
+    public void UpdateLives(){
+        if ((maxMistakes - mistakeCount) > 0){
+            scoreText.text = "Lives: " + (maxMistakes - mistakeCount);
+        }
+        else
+        {
+            scoreText.text = "Game Over!";
+        }
+        
+
     }
 
-    // w.i.p. method used to demonstrate traversals
-    private void InorderTraversal(BSTNode node, List<int> values)
-    {
-        if (node == null) return;
-        InorderTraversal(node.Left, values);
-        values.Add(node.Value);
-        InorderTraversal(node.Right, values);
-    }
+    // // w.i.p. method used to demonstrate traversals
+    // public void ShowInorderTraversal()
+    // {
+    //     List<int> values = new();
+    //     InorderTraversal(root, values);
+    //     traversalText.text = "Inorder: " + string.Join(", ", values);
+    // }
+
+    // // w.i.p. method used to demonstrate traversals
+    // private void InorderTraversal(BSTNode node, List<int> values)
+    // {
+    //     if (node == null) return;
+    //     InorderTraversal(node.Left, values);
+    //     values.Add(node.Value);
+    //     InorderTraversal(node.Right, values);
+    // }
 
     // method used when the player clicks a node to attempt deletion
     public void AttemptDeleteNode(BSTNodeBehavior nodeBehavior)
@@ -190,19 +153,19 @@ public class BSTManager : MonoBehaviour
             // deleted the invasive node
             Debug.Log("Invasive node deleted. :)");
 
-            // 1. Remove node from dictionary
+            // 1. remove node from dictionary
             if (nodeObjects.ContainsKey(nodeBehavior.Value))
             {
                 nodeObjects.Remove(nodeBehavior.Value);
             }
 
-            // 2. Remove node from BST structure
+            // 2. remove node from BST structure
             root = DeleteRecursive(root, nodeBehavior.Value);
 
-            // 3. Destroy the visual GameObject
+            // 3. destroy the visual GameObject
             Destroy(nodeBehavior.gameObject);
 
-            // 4. Update tree layout after deletion
+            // 4. update tree layout after deletion
             UpdateTree();
 
             // play the insert sound (until you get a successfully deleted sound or something)
@@ -216,6 +179,7 @@ public class BSTManager : MonoBehaviour
             // deleted a healthy node
             Debug.Log("Healthy node deleted. :(");
             mistakeCount++;
+            UpdateLives();
             if (mistakeCount >= maxMistakes)
             {
                 Debug.Log("Game Over.");
@@ -240,11 +204,11 @@ public class BSTManager : MonoBehaviour
         }
         else
         {
-            // Node found
+            //node found
             if (node.Left == null) return node.Right;
             if (node.Right == null) return node.Left;
 
-            // Node with two children: get the inorder successor (smallest in the right subtree)
+            //node with two children: get the inorder successor (smallest in the right subtree)
             BSTNode temp = FindMin(node.Right);
             node.Value = temp.Value;
             node.Right = DeleteRecursive(node.Right, temp.Value);
@@ -252,7 +216,7 @@ public class BSTManager : MonoBehaviour
         return node;
     }
 
-    // helper method to find the minimum value node in a subtree
+    //helper method to find the minimum value node in a subtree
     private BSTNode FindMin(BSTNode node)
     {
         while (node.Left != null)
