@@ -8,11 +8,12 @@ public class BSTNodeBehavior : MonoBehaviour
     private TMP_Text nodeText;
     private SpriteRenderer spriteRenderer;
 
-    public bool isInvasive = false; // NEW: Flag to track if the node is invasive
+    public bool isInvasive = false;
     public Color normalColor = Color.white;
     public Color invasiveColor = Color.red;
 
-    //this code is responsible for editing the TextMeshPro object on the node (displays node value), and making the invasive nodes red
+    // NEW: Reference to another object whose color should be changed
+    public GameObject targetObjectToColor;
 
     private void Awake()
     {
@@ -25,7 +26,6 @@ public class BSTNodeBehavior : MonoBehaviour
         }
     }
 
-    //method used to set the value of the node
     public void SetValue(int value)
     {
         Value = value;
@@ -35,21 +35,31 @@ public class BSTNodeBehavior : MonoBehaviour
         }
     }
 
-    //method used to set the invasive boolean
     public void SetInvasive(bool invasive)
     {
         isInvasive = invasive;
 
-        if (spriteRenderer != null)
+        // Change color of another object's SpriteRenderer instead of this one
+        if (targetObjectToColor != null)
         {
-            spriteRenderer.color = invasive ? invasiveColor : normalColor;
+            SpriteRenderer targetRenderer = targetObjectToColor.GetComponent<SpriteRenderer>();
+            if (targetRenderer != null)
+            {
+                targetRenderer.color = invasive ? invasiveColor : normalColor;
+            }
+            else
+            {
+                Debug.LogWarning("Target object does not have a SpriteRenderer.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No target object assigned to color.");
         }
     }
 
     private void OnMouseDown()
     {
-        //delete node with pointer click
         BSTManager.instance.AttemptDeleteNode(this);
     }
-
 }
