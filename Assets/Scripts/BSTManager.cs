@@ -6,10 +6,10 @@ public class BSTManager : MonoBehaviour
 {
     public static BSTManager instance;
 
-    [SerializeField] private GameObject nodePrefab; 
-    [SerializeField] private Transform treeContainer; 
+    [SerializeField] private GameObject nodePrefab;
+    [SerializeField] private Transform treeContainer;
     [SerializeField] private TMP_InputField inputField;
-    [SerializeField] private TMP_Text scoreText; 
+    [SerializeField] private TMP_Text scoreText;
 
     private BSTNode root;
     public Dictionary<int, GameObject> nodeObjects = new();
@@ -67,11 +67,9 @@ public class BSTManager : MonoBehaviour
 
             nodeBehavior.SetValue(value);
 
-            //40% chance a node is invasive
             bool makeInvasive = Random.value < 0.4f;
             nodeBehavior.SetInvasive(makeInvasive);
 
-            //Store the GameObject immediately
             nodeObjects[value] = newNode;
 
             return new BSTNode(value);
@@ -80,18 +78,10 @@ public class BSTManager : MonoBehaviour
         if (value < node.Value)
         {
             node.Left = InsertRecursive(node.Left, value);
-
-            var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
-            var childObj = nodeObjects[value].GetComponent<BSTNodeBehavior>();
-            parentObj.ConnectChild(childObj, isLeft: true);
         }
         else
         {
             node.Right = InsertRecursive(node.Right, value);
-
-            var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
-            var childObj = nodeObjects[value].GetComponent<BSTNodeBehavior>();
-            parentObj.ConnectChild(childObj, isLeft: false);
         }
 
         return node;
@@ -100,7 +90,63 @@ public class BSTManager : MonoBehaviour
     public void UpdateTree()
     {
         treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
+        UpdateConnections(); // NEW: Corrects all parent-child lines
     }
+
+    public void UpdateConnections()
+{
+    foreach (var obj in nodeObjects.Values)
+    {
+        var behavior = obj.GetComponent<BSTNodeBehavior>();
+        if (behavior != null)
+        {
+            behavior.leftChild = null;
+            behavior.rightChild = null;
+
+            if (behavior.targetObjectToColor != null)
+            {
+                LineRenderer lr = behavior.targetObjectToColor.GetComponent<LineRenderer>();
+                if (lr != null)
+                {
+                    lr.enabled = false;
+                }
+                // Else: it's fine — it just doesn't have a LineRenderer
+            }
+        }
+    }
+
+    ConnectRecursive(root);
+}
+
+
+    private void ConnectRecursive(BSTNode node)
+{
+    if (node == null) return;
+
+    if (!nodeObjects.ContainsKey(node.Value))
+    {
+        // Skip this node because its visual was deleted
+        return;
+    }
+
+    if (node.Left != null && nodeObjects.ContainsKey(node.Left.Value))
+    {
+        var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
+        var leftChildObj = nodeObjects[node.Left.Value].GetComponent<BSTNodeBehavior>();
+        parentObj.ConnectChild(leftChildObj, isLeft: true);
+    }
+
+    if (node.Right != null && nodeObjects.ContainsKey(node.Right.Value))
+    {
+        var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
+        var rightChildObj = nodeObjects[node.Right.Value].GetComponent<BSTNodeBehavior>();
+        parentObj.ConnectChild(rightChildObj, isLeft: false);
+    }
+
+    ConnectRecursive(node.Left);
+    ConnectRecursive(node.Right);
+}
+
 
     public void UpdateLives()
     {
@@ -114,55 +160,50 @@ public class BSTManager : MonoBehaviour
         }
     }
 
-   public void AttemptDeleteNode(BSTNodeBehavior nodeBehavior)
-{
-    if (nodeBehavior.isInvasive)
+    public void AttemptDeleteNode(BSTNodeBehavior nodeBehavior)
     {
-        Debug.Log("Invasive node deleted!");
-
-        // Disconnect parent lines
-        foreach (var obj in nodeObjects.Values)
+        if (nodeBehavior.isInvasive)
         {
-            BSTNodeBehavior parent = obj.GetComponent<BSTNodeBehavior>();
-            if (parent != null)
+            Debug.Log("Invasive node deleted!");
+
+            foreach (var obj in nodeObjects.Values)
             {
-                parent.DisconnectChild(nodeBehavior);
+                BSTNodeBehavior parent = obj.GetComponent<BSTNodeBehavior>();
+                if (parent != null)
+                {
+                    parent.DisconnectChild(nodeBehavior);
+                }
+            }
+
+            if (nodeObjects.ContainsKey(nodeBehavior.Value))
+            {
+                nodeObjects.Remove(nodeBehavior.Value);
+            }
+
+            root = DeleteRecursive(root, nodeBehavior.Value);
+            Destroy(nodeBehavior.gameObject);
+            UpdateTree();
+
+            if (SFXScript.instance != null)
+            {
+                SFXScript.instance.PlayInsertSound();
             }
         }
-
-        // Remove from dictionary
-        if (nodeObjects.ContainsKey(nodeBehavior.Value))
+        else
         {
-            nodeObjects.Remove(nodeBehavior.Value);
-        }
-
-        root = DeleteRecursive(root, nodeBehavior.Value);
-        Destroy(nodeBehavior.gameObject);
-        UpdateTree();
-
-        if (SFXScript.instance != null)
-        {
-            SFXScript.instance.PlayInsertSound();
+            Debug.Log("Healthy node deleted. Mistake made.");
+            mistakeCount++;
+            UpdateLives();
+            if (mistakeCount >= maxMistakes)
+            {
+                Debug.Log("Game Over.");
+            }
         }
     }
-    else
-    {
-        Debug.Log("Healthy node deleted. Mistake made.");
-        mistakeCount++;
-        UpdateLives();
-        if (mistakeCount >= maxMistakes)
-        {
-            Debug.Log("Game Over.");
-        }
-    }
-}
-
-
 
     private BSTNode DeleteRecursive(BSTNode node, int value)
     {
-        if (node == null)
-            return node;
+        if (node == null) return node;
 
         if (value < node.Value)
         {

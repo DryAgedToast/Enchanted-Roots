@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class BSTNodeBehavior : MonoBehaviour, IPointerClickHandler
+public class BSTNodeBehavior : MonoBehaviour
 {
     public int Value { get; private set; }
     private TMP_Text nodeText;
@@ -12,36 +12,34 @@ public class BSTNodeBehavior : MonoBehaviour, IPointerClickHandler
     public Color normalColor = Color.white;
     public Color invasiveColor = Color.red;
 
-    public GameObject targetObjectToColor; // Object to color (external circle sprite)
+    public GameObject targetObjectToColor;
 
-    // Line connections
     private LineRenderer leftLine;
     private LineRenderer rightLine;
     public Transform leftChild;
     public Transform rightChild;
 
     private void Awake()
-{
-    nodeText = GetComponentInChildren<TMP_Text>();
-    spriteRenderer = GetComponent<SpriteRenderer>();
-
-    // Find LineRenderers on child objects
-    Transform leftLineObj = transform.Find("LeftLine");
-    Transform rightLineObj = transform.Find("RightLine");
-
-    if (leftLineObj != null && rightLineObj != null)
     {
-        leftLine = leftLineObj.GetComponent<LineRenderer>();
-        rightLine = rightLineObj.GetComponent<LineRenderer>();
-    }
-    else
-    {
-        Debug.LogError("LeftLine or RightLine child object is missing on BSTNodePrefab!");
-    }
+        nodeText = GetComponentInChildren<TMP_Text>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
-    SetupLineRenderer(leftLine, Color.gray);
-    SetupLineRenderer(rightLine, Color.gray);
-}
+        Transform leftLineObj = transform.Find("LeftLine");
+        Transform rightLineObj = transform.Find("RightLine");
+
+        if (leftLineObj != null && rightLineObj != null)
+        {
+            leftLine = leftLineObj.GetComponent<LineRenderer>();
+            rightLine = rightLineObj.GetComponent<LineRenderer>();
+        }
+        else
+        {
+            Debug.LogError("LeftLine or RightLine child object is missing on BSTNodePrefab!");
+        }
+
+        SetupLineRenderer(leftLine, Color.gray);
+        SetupLineRenderer(rightLine, Color.gray);
+    }
 
     private void SetupLineRenderer(LineRenderer lr, Color color)
     {
@@ -105,40 +103,39 @@ public class BSTNodeBehavior : MonoBehaviour, IPointerClickHandler
     }
 
     private void Update()
-{
-    if (leftChild != null && leftLine != null)
     {
-        leftLine.SetPosition(0, transform.position);
-        leftLine.SetPosition(1, leftChild.position);
-    }
+        if (leftChild != null && leftLine != null)
+        {
+            leftLine.SetPosition(0, transform.position);
+            leftLine.SetPosition(1, leftChild.position);
+        }
 
-    if (rightChild != null && rightLine != null)
-    {
-        rightLine.SetPosition(0, transform.position);
-        rightLine.SetPosition(1, rightChild.position);
-    }
-}
-
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        BSTManager.instance.AttemptDeleteNode(this);
+        if (rightChild != null && rightLine != null)
+        {
+            rightLine.SetPosition(0, transform.position);
+            rightLine.SetPosition(1, rightChild.position);
+        }
     }
 
     public void DisconnectChild(BSTNodeBehavior child)
-{
-    if (child == null) return;
+    {
+        if (child == null) return;
 
-    if (leftChild == child.transform)
-    {
-        leftChild = null;
-        if (leftLine != null) leftLine.enabled = false;
+        if (leftChild == child.transform)
+        {
+            leftChild = null;
+            if (leftLine != null) leftLine.enabled = false;
+        }
+        else if (rightChild == child.transform)
+        {
+            rightChild = null;
+            if (rightLine != null) rightLine.enabled = false;
+        }
     }
-    else if (rightChild == child.transform)
-    {
-        rightChild = null;
-        if (rightLine != null) rightLine.enabled = false;
-    }
+
+    private void OnMouseDown()
+{
+    BSTManager.instance.AttemptDeleteNode(this);
 }
 
 }
