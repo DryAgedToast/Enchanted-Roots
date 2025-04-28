@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class BSTNodeBehavior : MonoBehaviour
+public class BSTNodeBehavior : MonoBehaviour, IPointerClickHandler
 {
     public int Value { get; private set; }
     private TMP_Text nodeText;
@@ -12,18 +12,49 @@ public class BSTNodeBehavior : MonoBehaviour
     public Color normalColor = Color.white;
     public Color invasiveColor = Color.red;
 
-    // NEW: Reference to another object whose color should be changed
-    public GameObject targetObjectToColor;
+    public GameObject targetObjectToColor; // Object to color (external circle sprite)
+
+    // Line connections
+    private LineRenderer leftLine;
+    private LineRenderer rightLine;
+    public Transform leftChild;
+    public Transform rightChild;
 
     private void Awake()
-    {
-        nodeText = GetComponentInChildren<TMP_Text>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+{
+    nodeText = GetComponentInChildren<TMP_Text>();
+    spriteRenderer = GetComponent<SpriteRenderer>();
 
-        if (spriteRenderer == null)
-        {
-            Debug.LogError("SpriteRenderer missing from BSTNodePrefab!");
-        }
+    // Find LineRenderers on child objects
+    Transform leftLineObj = transform.Find("LeftLine");
+    Transform rightLineObj = transform.Find("RightLine");
+
+    if (leftLineObj != null && rightLineObj != null)
+    {
+        leftLine = leftLineObj.GetComponent<LineRenderer>();
+        rightLine = rightLineObj.GetComponent<LineRenderer>();
+    }
+    else
+    {
+        Debug.LogError("LeftLine or RightLine child object is missing on BSTNodePrefab!");
+    }
+
+    SetupLineRenderer(leftLine, Color.gray);
+    SetupLineRenderer(rightLine, Color.gray);
+}
+
+    private void SetupLineRenderer(LineRenderer lr, Color color)
+    {
+        if (lr == null) return;
+
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+        lr.startWidth = 0.05f;
+        lr.endWidth = 0.05f;
+        lr.positionCount = 2;
+        lr.useWorldSpace = true;
+        lr.startColor = color;
+        lr.endColor = color;
+        lr.enabled = false;
     }
 
     public void SetValue(int value)
@@ -39,7 +70,6 @@ public class BSTNodeBehavior : MonoBehaviour
     {
         isInvasive = invasive;
 
-        // Change color of another object's SpriteRenderer instead of this one
         if (targetObjectToColor != null)
         {
             SpriteRenderer targetRenderer = targetObjectToColor.GetComponent<SpriteRenderer>();
@@ -49,7 +79,7 @@ public class BSTNodeBehavior : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Target object does not have a SpriteRenderer.");
+                Debug.LogWarning("Target object to color missing SpriteRenderer!");
             }
         }
         else
@@ -58,8 +88,57 @@ public class BSTNodeBehavior : MonoBehaviour
         }
     }
 
-    private void OnMouseDown()
+    public void ConnectChild(BSTNodeBehavior child, bool isLeft)
+    {
+        if (child == null) return;
+
+        if (isLeft)
+        {
+            leftChild = child.transform;
+            leftLine.enabled = true;
+        }
+        else
+        {
+            rightChild = child.transform;
+            rightLine.enabled = true;
+        }
+    }
+
+    private void Update()
+{
+    if (leftChild != null && leftLine != null)
+    {
+        leftLine.SetPosition(0, transform.position);
+        leftLine.SetPosition(1, leftChild.position);
+    }
+
+    if (rightChild != null && rightLine != null)
+    {
+        rightLine.SetPosition(0, transform.position);
+        rightLine.SetPosition(1, rightChild.position);
+    }
+}
+
+
+    public void OnPointerClick(PointerEventData eventData)
     {
         BSTManager.instance.AttemptDeleteNode(this);
     }
+
+    public void DisconnectChild(BSTNodeBehavior child)
+{
+    if (child == null) return;
+
+    if (leftChild == child.transform)
+    {
+        leftChild = null;
+        if (leftLine != null) leftLine.enabled = false;
+    }
+    else if (rightChild == child.transform)
+    {
+        rightChild = null;
+        if (rightLine != null) rightLine.enabled = false;
+    }
+}
+
 }

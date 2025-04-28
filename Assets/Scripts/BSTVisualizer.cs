@@ -1,12 +1,9 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class BSTVisualizer : MonoBehaviour
 {
-    //this script is responsible for deciding how far away the nodes get positioned when instantiated on the tree
-
-    public float xSpacing = 2.5f; // Horizontal spacing
-    public float ySpacing = 2.0f; // Vertical spacing
+    public float xSpacing = 2.5f;
+    public float ySpacing = 2.0f;
 
     public void UpdatePositions(BSTNode root, float x = 0, float y = 0, int depth = 0)
     {
@@ -18,10 +15,7 @@ public class BSTVisualizer : MonoBehaviour
             nodeObj.transform.position = position;
         }
 
-        // Recursive positioning for left and right children
         UpdatePositions(root.Left, x - xSpacing / (depth + 1), y - ySpacing, depth + 1);
         UpdatePositions(root.Right, x + xSpacing / (depth + 1), y - ySpacing, depth + 1);
     }
-
-    
 }
