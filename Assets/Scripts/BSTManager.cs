@@ -64,12 +64,17 @@ public class BSTManager : MonoBehaviour
         {
             GameObject newNode = Instantiate(nodePrefab, treeContainer);
             var nodeBehavior = newNode.GetComponent<BSTNodeBehavior>();
-
             nodeBehavior.SetValue(value);
-
+            if (newNode.GetComponent<BSTNodeGlow>() != null)
+                {
+                    Debug.Log($"{newNode.name} HAS BSTNodeGlow attached.");
+                }
+                else
+                {
+                    Debug.LogWarning($"{newNode.name} DOES NOT have BSTNodeGlow attached!");
+                }
             bool makeInvasive = Random.value < 0.4f;
-            nodeBehavior.SetInvasive(makeInvasive);
-
+            nodeBehavior.SetInvasive(makeInvasive);       
             nodeObjects[value] = newNode;
 
             return new BSTNode(value);
