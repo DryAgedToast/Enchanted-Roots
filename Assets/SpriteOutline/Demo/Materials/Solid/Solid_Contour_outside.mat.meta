@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 5a6db85ebb9466f4b90af9ebdd3c4fdc
+timeCreated: 1516444419
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 109669
+  packageName: 2D Sprite Outline
+  packageVersion: 1.1
+  assetPath: Assets/SpriteOutline/Demo/Materials/Solid/Solid_Contour_outside.mat
+  uploadId: 235929

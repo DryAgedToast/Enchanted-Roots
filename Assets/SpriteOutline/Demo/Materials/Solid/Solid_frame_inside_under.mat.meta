@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 583db57eb31993c4b992fa0f13152214
+timeCreated: 1516444606
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 109669
+  packageName: 2D Sprite Outline
+  packageVersion: 1.1
+  assetPath: Assets/SpriteOutline/Demo/Materials/Solid/Solid_frame_inside_under.mat
+  uploadId: 235929

@@ -445,6 +445,7 @@ MonoBehaviour:
   treeContainer: {fileID: 1917260848}
   inputField: {fileID: 1477217190}
   scoreText: {fileID: 405533116}
+  nodeParent: {fileID: 0}
 --- !u!4 &517439664
 Transform:
   m_ObjectHideFlags: 0

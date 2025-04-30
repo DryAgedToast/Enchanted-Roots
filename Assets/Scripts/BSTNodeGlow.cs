@@ -1,57 +1,45 @@
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 public class BSTNodeGlow : MonoBehaviour
 {
     private SpriteRenderer spriteRenderer;
-    private static Bloom bloom;
-    private static float defaultIntensity;
-    private static bool bloomInitialized = false;
+    private Material materialInstance;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-        if (!bloomInitialized)
+        if (spriteRenderer != null)
         {
-            Volume bloomVolume = FindAnyObjectByType<Volume>();
-
-            if (bloomVolume != null && bloomVolume.profile.TryGet(out bloom))
-            {
-                defaultIntensity = bloom.intensity.value;
-                bloomInitialized = true;
-            }
-            else
-            {
-                Debug.LogWarning("Could not find Bloom in Volume profile!");
-            }
+            // Make sure we have a unique instance of the material
+            materialInstance = Instantiate(spriteRenderer.material);
+            spriteRenderer.material = materialInstance;
         }
     }
 
     public void EnableGlow()
     {
-        if (spriteRenderer != null)
+        if (materialInstance != null)
         {
-            Debug.Log($"{gameObject.name}: Glow ENABLED");
-        }
-
-        if (bloom != null)
-        {
-            bloom.intensity.value += 3f; // <<< Set intensity lower to "remove" bloom
+            materialInstance.SetFloat("_OutlineThickness", 1.5f); // Or your custom shader property
+            materialInstance.SetColor("_OutlineColor", Color.white);
         }
     }
 
     public void DisableGlow()
     {
-        if (spriteRenderer != null)
+        if (materialInstance != null)
         {
-            Debug.Log($"{gameObject.name}: Glow DISABLED");
-        }
-
-        if (bloom != null)
-        {
-            bloom.intensity.value = defaultIntensity; // <<< Restore original bloom intensity
+            materialInstance.SetFloat("_OutlineThickness", 0f);
         }
     }
+
+    void OnMouseEnter()
+{
+    EnableGlow();
+}
+
+void OnMouseExit()
+{
+    DisableGlow();
+}
 }

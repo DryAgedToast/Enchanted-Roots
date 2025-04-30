@@ -11,7 +11,8 @@ public class BSTManager : MonoBehaviour
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text scoreText;
 
-    private BSTNode root;
+    public Transform nodeParent;
+    public BSTNode root;
     public Dictionary<int, GameObject> nodeObjects = new();
 
     private int mistakeCount = 0;
@@ -65,18 +66,11 @@ public class BSTManager : MonoBehaviour
             GameObject newNode = Instantiate(nodePrefab, treeContainer);
             var nodeBehavior = newNode.GetComponent<BSTNodeBehavior>();
             nodeBehavior.SetValue(value);
-            if (newNode.GetComponent<BSTNodeGlow>() != null)
-                {
-                    Debug.Log($"{newNode.name} HAS BSTNodeGlow attached.");
-                }
-                else
-                {
-                    Debug.LogWarning($"{newNode.name} DOES NOT have BSTNodeGlow attached!");
-                }
-            bool makeInvasive = Random.value < 0.4f;
-            nodeBehavior.SetInvasive(makeInvasive);       
-            nodeObjects[value] = newNode;
 
+            bool makeInvasive = Random.value < 0.4f;
+            nodeBehavior.SetInvasive(makeInvasive);
+
+            nodeObjects[value] = newNode;
             return new BSTNode(value);
         }
 
@@ -92,66 +86,115 @@ public class BSTManager : MonoBehaviour
         return node;
     }
 
-    public void UpdateTree()
+    public void InsertAt(BSTNodeBehavior currentNode, int value)
     {
-        treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
-        UpdateConnections(); // NEW: Corrects all parent-child lines
-    }
-
-    public void UpdateConnections()
-{
-    foreach (var obj in nodeObjects.Values)
-    {
-        var behavior = obj.GetComponent<BSTNodeBehavior>();
-        if (behavior != null)
+        // VISUAL-ONLY INSERTION (e.g., from drag-and-drop)
+        if (value < currentNode.Value)
         {
-            behavior.leftChild = null;
-            behavior.rightChild = null;
-
-            if (behavior.targetObjectToColor != null)
+            if (currentNode.leftChild == null)
             {
-                LineRenderer lr = behavior.targetObjectToColor.GetComponent<LineRenderer>();
-                if (lr != null)
-                {
-                    lr.enabled = false;
-                }
-                // Else: it's fine — it just doesn't have a LineRenderer
+                GameObject newNodeObj = Instantiate(nodePrefab,
+                    currentNode.transform.position + Vector3.left * 1.5f + Vector3.down * 1.5f,
+                    Quaternion.identity,
+                    nodeParent);
+
+                BSTNodeBehavior newNode = newNodeObj.GetComponent<BSTNodeBehavior>();
+                newNode.SetValue(value);
+
+                bool makeInvasive = Random.value < 0.4f;
+                newNode.SetInvasive(makeInvasive);
+
+                currentNode.ConnectChild(newNode, true);
+                nodeObjects[value] = newNodeObj;
             }
+            else
+            {
+                InsertAt(currentNode.leftChild.GetComponent<BSTNodeBehavior>(), value);
+            }
+        }
+        else
+        {
+            if (currentNode.rightChild == null)
+            {
+                GameObject newNodeObj = Instantiate(nodePrefab,
+                    currentNode.transform.position + Vector3.right * 1.5f + Vector3.down * 1.5f,
+                    Quaternion.identity,
+                    nodeParent);
+
+                BSTNodeBehavior newNode = newNodeObj.GetComponent<BSTNodeBehavior>();
+                newNode.SetValue(value);
+
+                bool makeInvasive = Random.value < 0.4f;
+                newNode.SetInvasive(makeInvasive);
+
+                currentNode.ConnectChild(newNode, false);
+                nodeObjects[value] = newNodeObj;
+            }
+            else
+            {
+                InsertAt(currentNode.rightChild.GetComponent<BSTNodeBehavior>(), value);
+            }
+        }
+
+        if (SFXScript.instance != null)
+        {
+            SFXScript.instance.PlayInsertSound();
         }
     }
 
-    ConnectRecursive(root);
-}
+    public void UpdateTree()
+    {
+        treeContainer.GetComponent<BSTVisualizer>().UpdatePositions(root);
+        UpdateConnections();
+    }
 
+    public void UpdateConnections()
+    {
+        foreach (var obj in nodeObjects.Values)
+        {
+            var behavior = obj.GetComponent<BSTNodeBehavior>();
+            if (behavior != null)
+            {
+                behavior.leftChild = null;
+                behavior.rightChild = null;
+
+                if (behavior.targetObjectToColor != null)
+                {
+                    LineRenderer lr = behavior.targetObjectToColor.GetComponent<LineRenderer>();
+                    if (lr != null)
+                    {
+                        lr.enabled = false;
+                    }
+                }
+            }
+        }
+
+        ConnectRecursive(root);
+    }
 
     private void ConnectRecursive(BSTNode node)
-{
-    if (node == null) return;
-
-    if (!nodeObjects.ContainsKey(node.Value))
     {
-        // Skip this node because its visual was deleted
-        return;
-    }
+        if (node == null) return;
 
-    if (node.Left != null && nodeObjects.ContainsKey(node.Left.Value))
-    {
+        if (!nodeObjects.ContainsKey(node.Value)) return;
+
         var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
-        var leftChildObj = nodeObjects[node.Left.Value].GetComponent<BSTNodeBehavior>();
-        parentObj.ConnectChild(leftChildObj, isLeft: true);
+
+        if (node.Left != null && nodeObjects.ContainsKey(node.Left.Value))
+        {
+            var leftChildObj = nodeObjects[node.Left.Value].GetComponent<BSTNodeBehavior>();
+            parentObj.ConnectChild(leftChildObj, isLeft: true);
+        }
+
+        if (node.Right != null && nodeObjects.ContainsKey(node.Right.Value))
+        {
+            var rightChildObj = nodeObjects[node.Right.Value].GetComponent<BSTNodeBehavior>();
+            parentObj.ConnectChild(rightChildObj, isLeft: false);
+        }
+
+        ConnectRecursive(node.Left);
+        ConnectRecursive(node.Right);
     }
-
-    if (node.Right != null && nodeObjects.ContainsKey(node.Right.Value))
-    {
-        var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
-        var rightChildObj = nodeObjects[node.Right.Value].GetComponent<BSTNodeBehavior>();
-        parentObj.ConnectChild(rightChildObj, isLeft: false);
-    }
-
-    ConnectRecursive(node.Left);
-    ConnectRecursive(node.Right);
-}
-
 
     public void UpdateLives()
     {
@@ -238,34 +281,4 @@ public class BSTManager : MonoBehaviour
         }
         return node;
     }
-
-    public void InsertAt(BSTNodeBehavior targetNode, int value)
-{
-    if (targetNode == null) return;
-
-    // Insertion logic
-    if (value < targetNode.Value)
-    {
-        if (targetNode.leftChild == null)
-        {
-            Insert(value); // Standard insert
-        }
-        else
-        {
-            InsertAt(targetNode.leftChild.GetComponent<BSTNodeBehavior>(), value);
-        }
-    }
-    else
-    {
-        if (targetNode.rightChild == null)
-        {
-            Insert(value); // Standard insert
-        }
-        else
-        {
-            InsertAt(targetNode.rightChild.GetComponent<BSTNodeBehavior>(), value);
-        }
-    }
-}
-
 }

@@ -491,7 +491,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -7810525197778879289, guid: 756ef1b8e1036f24f817800837c91eaa, type: 3}
-  m_Color: {r: 0.9687161, g: 0.9716981, b: 0.9579477, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -513,8 +513,7 @@ GameObject:
   - component: {fileID: 430214222340186483}
   - component: {fileID: 3899948215734151422}
   - component: {fileID: 8186261260788888114}
-  - component: {fileID: 4723978162033996384}
-  - component: {fileID: 3723181974635830014}
+  - component: {fileID: 8984636950591979893}
   m_Layer: 0
   m_Name: BSTNodePrefab
   m_TagString: Untagged
@@ -624,7 +623,7 @@ CircleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b0e49f06df5d34232ae8cf35ce6a80c1, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -650,7 +649,7 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
---- !u!114 &4723978162033996384
+--- !u!114 &8984636950591979893
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -659,18 +658,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 7318434673616142976}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ff15f0aad562449ba48175ad12930df, type: 3}
+  m_Script: {fileID: 11500000, guid: 5577c8eef27a85c42869c484aa8a117a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3723181974635830014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7318434673616142976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9456a43172727424c8f6080c3dae7d7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  outlineMaterial: {fileID: 2100000, guid: 5a6db85ebb9466f4b90af9ebdd3c4fdc, type: 2}
+  defaultMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
