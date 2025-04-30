@@ -233,4 +233,34 @@ public class BSTManager : MonoBehaviour
         }
         return node;
     }
+
+    public void InsertAt(BSTNodeBehavior targetNode, int value)
+{
+    if (targetNode == null) return;
+
+    // Insertion logic
+    if (value < targetNode.Value)
+    {
+        if (targetNode.leftChild == null)
+        {
+            Insert(value); // Standard insert
+        }
+        else
+        {
+            InsertAt(targetNode.leftChild.GetComponent<BSTNodeBehavior>(), value);
+        }
+    }
+    else
+    {
+        if (targetNode.rightChild == null)
+        {
+            Insert(value); // Standard insert
+        }
+        else
+        {
+            InsertAt(targetNode.rightChild.GetComponent<BSTNodeBehavior>(), value);
+        }
+    }
+}
+
 }

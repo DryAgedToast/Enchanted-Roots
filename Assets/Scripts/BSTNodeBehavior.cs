@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class BSTNodeBehavior : MonoBehaviour
+public class BSTNodeBehavior : MonoBehaviour, IDropHandler
 {
     public int Value { get; private set; }
     private TMP_Text nodeText;
@@ -138,4 +138,23 @@ public class BSTNodeBehavior : MonoBehaviour
     BSTManager.instance.AttemptDeleteNode(this);
 }
 
+
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        var draggedItem = eventData.pointerDrag?.GetComponent<QueueItem>();
+        if (draggedItem != null)
+        {
+            // Insert the value at this node
+            BSTManager.instance.InsertAt(this, draggedItem.GetValue());
+
+            // Destroy dragged queue item
+            Destroy(draggedItem.gameObject);
+
+            QueueManager.instance.CheckLevelComplete();
+        }
+    }
 }
+
+
+
