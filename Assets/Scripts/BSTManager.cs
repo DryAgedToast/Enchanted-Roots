@@ -86,26 +86,14 @@ public class BSTManager : MonoBehaviour
         return node;
     }
 
+    // ✅ FIXED VERSION: no manual positions, reuses logic tree and updates all visuals after
     public void InsertAt(BSTNodeBehavior currentNode, int value)
     {
-        // VISUAL-ONLY INSERTION (e.g., from drag-and-drop)
         if (value < currentNode.Value)
         {
             if (currentNode.leftChild == null)
             {
-                GameObject newNodeObj = Instantiate(nodePrefab,
-                    currentNode.transform.position + Vector3.left * 1.5f + Vector3.down * 1.5f,
-                    Quaternion.identity,
-                    nodeParent);
-
-                BSTNodeBehavior newNode = newNodeObj.GetComponent<BSTNodeBehavior>();
-                newNode.SetValue(value);
-
-                bool makeInvasive = Random.value < 0.4f;
-                newNode.SetInvasive(makeInvasive);
-
-                currentNode.ConnectChild(newNode, true);
-                nodeObjects[value] = newNodeObj;
+                root = InsertRecursive(root, value);
             }
             else
             {
@@ -116,19 +104,7 @@ public class BSTManager : MonoBehaviour
         {
             if (currentNode.rightChild == null)
             {
-                GameObject newNodeObj = Instantiate(nodePrefab,
-                    currentNode.transform.position + Vector3.right * 1.5f + Vector3.down * 1.5f,
-                    Quaternion.identity,
-                    nodeParent);
-
-                BSTNodeBehavior newNode = newNodeObj.GetComponent<BSTNodeBehavior>();
-                newNode.SetValue(value);
-
-                bool makeInvasive = Random.value < 0.4f;
-                newNode.SetInvasive(makeInvasive);
-
-                currentNode.ConnectChild(newNode, false);
-                nodeObjects[value] = newNodeObj;
+                root = InsertRecursive(root, value);
             }
             else
             {
@@ -136,10 +112,7 @@ public class BSTManager : MonoBehaviour
             }
         }
 
-        if (SFXScript.instance != null)
-        {
-            SFXScript.instance.PlayInsertSound();
-        }
+        UpdateTree(); // reposition nodes and update visuals/lines
     }
 
     public void UpdateTree()
@@ -175,7 +148,6 @@ public class BSTManager : MonoBehaviour
     private void ConnectRecursive(BSTNode node)
     {
         if (node == null) return;
-
         if (!nodeObjects.ContainsKey(node.Value)) return;
 
         var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
@@ -183,13 +155,13 @@ public class BSTManager : MonoBehaviour
         if (node.Left != null && nodeObjects.ContainsKey(node.Left.Value))
         {
             var leftChildObj = nodeObjects[node.Left.Value].GetComponent<BSTNodeBehavior>();
-            parentObj.ConnectChild(leftChildObj, isLeft: true);
+            parentObj.ConnectChild(leftChildObj, true);
         }
 
         if (node.Right != null && nodeObjects.ContainsKey(node.Right.Value))
         {
             var rightChildObj = nodeObjects[node.Right.Value].GetComponent<BSTNodeBehavior>();
-            parentObj.ConnectChild(rightChildObj, isLeft: false);
+            parentObj.ConnectChild(rightChildObj, false);
         }
 
         ConnectRecursive(node.Left);
