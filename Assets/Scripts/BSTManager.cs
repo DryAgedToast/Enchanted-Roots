@@ -10,13 +10,16 @@ public class BSTManager : MonoBehaviour
     [SerializeField] private Transform treeContainer;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private GameObject Heart1;
+    [SerializeField] private GameObject Heart2;
+    [SerializeField] private GameObject Heart3;
 
     public Transform nodeParent;
     public BSTNode root;
     public Dictionary<int, GameObject> nodeObjects = new();
 
     private int mistakeCount = 0;
-    private int maxMistakes = 100;
+    private int maxMistakes = 3;
 
     private void Awake()
     {
@@ -200,10 +203,15 @@ public class BSTManager : MonoBehaviour
     {
         if ((maxMistakes - mistakeCount) > 0)
         {
-            scoreText.text = "Lives: " + (maxMistakes - mistakeCount);
+            if(mistakeCount == 1){
+                Heart3.SetActive(false);
+            } else if(mistakeCount == 2){
+                Heart2.SetActive(false);
+            }
         }
         else
         {
+            Heart1.SetActive(false);
             scoreText.text = "Game Over!";
         }
     }
