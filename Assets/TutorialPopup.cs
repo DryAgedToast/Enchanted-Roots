@@ -7,7 +7,7 @@ public class TutorialPopup : MonoBehaviour
     public Image tutorialImage;
     public Sprite[] tutorialPages;
     public GameObject popupUI; // parent container for canvas group
-    public GameObject nodeCanvas;
+    public GameObject nodeCanvas; // canvas where nodes are located
     private int currentPage = 0;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
