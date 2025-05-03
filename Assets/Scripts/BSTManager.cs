@@ -10,15 +10,13 @@ public class BSTManager : MonoBehaviour
     [SerializeField] public Transform treeContainer;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text scoreText;
-
     [SerializeField] private GameObject winScreen;
 
+    [SerializeField] private List<int> initialValues; // Added this field to the inspector
 
     public Transform nodeParent;
     public BSTNode root;
     public Dictionary<int, GameObject> nodeObjects = new();
-
-    
 
     private int mistakeCount = 0;
     private int maxMistakes = 100;
@@ -33,9 +31,12 @@ public class BSTManager : MonoBehaviour
 
     private void Start()
     {
-        Insert(10);
-        Insert(5);
-        Insert(15);
+        // Insert values from the initialValues list
+        foreach (var value in initialValues)
+        {
+            Insert(value);
+        }
+
         UpdateTree();
         UpdateLives();
     }
@@ -91,25 +92,21 @@ public class BSTManager : MonoBehaviour
         return node;
     }
 
-    // ✅ FIXED VERSION: no manual positions, reuses logic tree and updates all visuals after
-public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
-{
-    GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
-    var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
-    newBehavior.SetValue(value);
-    newBehavior.SetInvasive(Random.value < 0.4f);
+    public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
+    {
+        GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
+        var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
+        newBehavior.SetValue(value);
+        newBehavior.SetInvasive(Random.value < 0.4f);
 
-    nodeObjects[value] = newNodeObj;
+        nodeObjects[value] = newNodeObj;
 
-    Vector3 offset = new Vector3(isLeft ? -1.5f : 1.5f, -1.5f, 0f);
-    newNodeObj.transform.position = parentNode.transform.position + offset;
+        Vector3 offset = new Vector3(isLeft ? -1.5f : 1.5f, -1.5f, 0f);
+        newNodeObj.transform.position = parentNode.transform.position + offset;
 
-    parentNode.ConnectChild(newBehavior, isLeft);
-    return newNodeObj;
-}
-
-
-
+        parentNode.ConnectChild(newBehavior, isLeft);
+        return newNodeObj;
+    }
 
     public void UpdateTree()
     {
@@ -250,40 +247,38 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
         return node;
     }
 
-public void OnSubmitTree()
-{
-    if (IsValidBST(root, int.MinValue, int.MaxValue))
+    public void OnSubmitTree()
     {
-        Debug.Log("Tree is valid!");
-        if (winScreen != null) winScreen.SetActive(true);
+        if (IsValidBST(root, int.MinValue, int.MaxValue))
+        {
+            Debug.Log("Tree is valid!");
+            if (winScreen != null) winScreen.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Invalid BST. Resetting tree.");
+            ResetTree();
+        }
     }
-    else
+
+    private bool IsValidBST(BSTNode node, int min, int max)
     {
-        Debug.Log("Invalid BST. Resetting tree.");
-        ResetTree();
+        if (node == null) return true;
+        if (node.Value <= min || node.Value >= max) return false;
+
+        return IsValidBST(node.Left, min, node.Value) &&
+               IsValidBST(node.Right, node.Value, max);
     }
-}
 
-
-private bool IsValidBST(BSTNode node, int min, int max)
-{
-    if (node == null) return true;
-    if (node.Value <= min || node.Value >= max) return false;
-
-    return IsValidBST(node.Left, min, node.Value) &&
-           IsValidBST(node.Right, node.Value, max);
-}
-
-public void ResetTree()
-{
-    foreach (var obj in nodeObjects.Values)
+    public void ResetTree()
     {
-        Destroy(obj);
+        foreach (var obj in nodeObjects.Values)
+        {
+            Destroy(obj);
+        }
+        nodeObjects.Clear();
+        root = null;
+        mistakeCount++;
+        UpdateLives();
     }
-    nodeObjects.Clear();
-    root = null;
-    mistakeCount++;
-    UpdateLives();
-}
-
 }
