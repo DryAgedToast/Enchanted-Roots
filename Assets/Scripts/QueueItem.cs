@@ -25,26 +25,35 @@ public class QueueItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
             valueText.text = v.ToString();
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        canvasGroup.alpha = 0.6f;
-        canvasGroup.blocksRaycasts = false;
-        originalParent = transform.parent;
-        transform.SetParent(transform.root); // Move to top layer
-    }
-
     public void OnDrag(PointerEventData eventData)
     {
         rectTransform.position = eventData.position;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+public void OnBeginDrag(PointerEventData eventData)
+{
+    canvasGroup.alpha = 0.5f; // Make it transparent
+    canvasGroup.blocksRaycasts = false;
+
+    foreach (var obj in BSTManager.instance.nodeObjects.Values)
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
-        transform.SetParent(originalParent);
-        transform.localPosition = Vector3.zero; // Snap back if not dropped
+        var behavior = obj.GetComponent<BSTNodeBehavior>();
+        behavior.ShowDropZones(true);
     }
+}
+
+public void OnEndDrag(PointerEventData eventData)
+{
+    canvasGroup.alpha = 1f; // Restore opacity
+    canvasGroup.blocksRaycasts = true;
+
+    foreach (var obj in BSTManager.instance.nodeObjects.Values)
+    {
+        var behavior = obj.GetComponent<BSTNodeBehavior>();
+        behavior.ShowDropZones(false);
+    }
+}
+
 
     public int GetValue()
     {

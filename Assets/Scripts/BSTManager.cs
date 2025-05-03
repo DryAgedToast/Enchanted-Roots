@@ -6,14 +6,19 @@ public class BSTManager : MonoBehaviour
 {
     public static BSTManager instance;
 
-    [SerializeField] private GameObject nodePrefab;
-    [SerializeField] private Transform treeContainer;
+    [SerializeField] public GameObject nodePrefab;
+    [SerializeField] public Transform treeContainer;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text scoreText;
+
+    [SerializeField] private GameObject winScreen;
+
 
     public Transform nodeParent;
     public BSTNode root;
     public Dictionary<int, GameObject> nodeObjects = new();
+
+    
 
     private int mistakeCount = 0;
     private int maxMistakes = 100;
@@ -87,33 +92,24 @@ public class BSTManager : MonoBehaviour
     }
 
     // ✅ FIXED VERSION: no manual positions, reuses logic tree and updates all visuals after
-    public void InsertAt(BSTNodeBehavior currentNode, int value)
-    {
-        if (value < currentNode.Value)
-        {
-            if (currentNode.leftChild == null)
-            {
-                root = InsertRecursive(root, value);
-            }
-            else
-            {
-                InsertAt(currentNode.leftChild.GetComponent<BSTNodeBehavior>(), value);
-            }
-        }
-        else
-        {
-            if (currentNode.rightChild == null)
-            {
-                root = InsertRecursive(root, value);
-            }
-            else
-            {
-                InsertAt(currentNode.rightChild.GetComponent<BSTNodeBehavior>(), value);
-            }
-        }
+public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
+{
+    GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
+    var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
+    newBehavior.SetValue(value);
+    newBehavior.SetInvasive(Random.value < 0.4f);
 
-        UpdateTree(); // reposition nodes and update visuals/lines
-    }
+    nodeObjects[value] = newNodeObj;
+
+    Vector3 offset = new Vector3(isLeft ? -1.5f : 1.5f, -1.5f, 0f);
+    newNodeObj.transform.position = parentNode.transform.position + offset;
+
+    parentNode.ConnectChild(newBehavior, isLeft);
+    return newNodeObj;
+}
+
+
+
 
     public void UpdateTree()
     {
@@ -253,4 +249,41 @@ public class BSTManager : MonoBehaviour
         }
         return node;
     }
+
+public void OnSubmitTree()
+{
+    if (IsValidBST(root, int.MinValue, int.MaxValue))
+    {
+        Debug.Log("Tree is valid!");
+        if (winScreen != null) winScreen.SetActive(true);
+    }
+    else
+    {
+        Debug.Log("Invalid BST. Resetting tree.");
+        ResetTree();
+    }
+}
+
+
+private bool IsValidBST(BSTNode node, int min, int max)
+{
+    if (node == null) return true;
+    if (node.Value <= min || node.Value >= max) return false;
+
+    return IsValidBST(node.Left, min, node.Value) &&
+           IsValidBST(node.Right, node.Value, max);
+}
+
+public void ResetTree()
+{
+    foreach (var obj in nodeObjects.Values)
+    {
+        Destroy(obj);
+    }
+    nodeObjects.Clear();
+    root = null;
+    mistakeCount++;
+    UpdateLives();
+}
+
 }
