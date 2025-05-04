@@ -41,7 +41,8 @@ public void OnDrop(PointerEventData eventData)
     int value = draggedItem.GetValue();
     GameObject inserted = BSTManager.instance.InsertAt(parentNode, value, isLeft);
     var behavior = inserted.GetComponent<BSTNodeBehavior>();
-    behavior.SetInvasive(Random.value < 0.4f);
+    
+    //behavior.SetInvasive(Random.value < 0.4f);
 
     Destroy(draggedItem.gameObject);
     QueueManager.instance.CheckLevelComplete();
