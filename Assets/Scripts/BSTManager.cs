@@ -1,23 +1,25 @@
 using UnityEngine;
-using UnityEngine.UI; //SR
+using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
 public class BSTManager : MonoBehaviour
 {
     public static BSTManager instance;
-    // CREATION OF WIN STATE STARTS HERE V V
-    public enum GamePhase { Deletion, Insertion, Submission} // SR
-    public GamePhase currentPhase = GamePhase.Deletion; // SR
-    
+
+    public enum GamePhase { Deletion, Insertion, Submission }
+    public GamePhase currentPhase = GamePhase.Deletion;
+
     [SerializeField] public GameObject nodePrefab;
     [SerializeField] public Transform treeContainer;
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private GameObject winScreen;
 
-    [SerializeField] private List<int> initialValues; // Added this field to the inspector
-    [SerializeField] private Button submitButton; // SR
+    [SerializeField] private List<int> initialValues;
+    [SerializeField] private List<bool> initialInvasiveFlags; // New: parallel to initialValues
+
+    [SerializeField] private Button submitButton;
 
     public Transform nodeParent;
     public BSTNode root;
@@ -25,7 +27,7 @@ public class BSTManager : MonoBehaviour
 
     private int mistakeCount = 0;
     private int maxMistakes = 100;
-    private int nodesLeft = 2; //SR
+    private int nodesLeft = 2;
 
     private void Awake()
     {
@@ -37,10 +39,11 @@ public class BSTManager : MonoBehaviour
 
     private void Start()
     {
-        // Insert values from the initialValues list
-        foreach (var value in initialValues)
+        for (int i = 0; i < initialValues.Count; i++)
         {
-            Insert(value);
+            int value = initialValues[i];
+            bool isInvasive = (i < initialInvasiveFlags.Count) ? initialInvasiveFlags[i] : false;
+            Insert(value, isInvasive);
         }
 
         UpdateTree();
@@ -49,14 +52,15 @@ public class BSTManager : MonoBehaviour
 
     public void InsertFromUI()
     {
-        if (currentPhase != GamePhase.Insertion) { // Make sure all invasive nodes gone
-            Debug.Log("You must delete all invasive nodes first."); // SR
-            return; // SR
+        if (currentPhase != GamePhase.Insertion)
+        {
+            Debug.Log("You must delete all invasive nodes first.");
+            return;
         }
         if (int.TryParse(inputField.text, out int value))
         {
-            Insert(value);
-            currentPhase = GamePhase.Submission; //SR Changes GamePhase to know be submission
+            Insert(value, false); // Always non-invasive from UI
+            currentPhase = GamePhase.Submission;
             submitButton.interactable = true;
             inputField.text = "";
         }
@@ -66,9 +70,9 @@ public class BSTManager : MonoBehaviour
         }
     }
 
-    public void Insert(int value)
+    public void Insert(int value, bool isInvasive)
     {
-        root = InsertRecursive(root, value);
+        root = InsertRecursive(root, value, isInvasive);
         UpdateTree();
 
         if (SFXScript.instance != null)
@@ -77,16 +81,14 @@ public class BSTManager : MonoBehaviour
         }
     }
 
-    private BSTNode InsertRecursive(BSTNode node, int value)
+    private BSTNode InsertRecursive(BSTNode node, int value, bool isInvasive)
     {
         if (node == null)
         {
             GameObject newNode = Instantiate(nodePrefab, treeContainer);
             var nodeBehavior = newNode.GetComponent<BSTNodeBehavior>();
             nodeBehavior.SetValue(value);
-
-            bool makeInvasive = Random.value < 0.4f;
-            nodeBehavior.SetInvasive(makeInvasive);
+            nodeBehavior.SetInvasive(isInvasive);
 
             nodeObjects[value] = newNode;
             return new BSTNode(value);
@@ -94,11 +96,11 @@ public class BSTManager : MonoBehaviour
 
         if (value < node.Value)
         {
-            node.Left = InsertRecursive(node.Left, value);
+            node.Left = InsertRecursive(node.Left, value, isInvasive);
         }
         else
         {
-            node.Right = InsertRecursive(node.Right, value);
+            node.Right = InsertRecursive(node.Right, value, isInvasive);
         }
 
         return node;
@@ -106,15 +108,16 @@ public class BSTManager : MonoBehaviour
 
     public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
     {
-        if (currentPhase != GamePhase.Insertion) // SR
+        if (currentPhase != GamePhase.Insertion)
         {
-            Debug.Log("You must remove invasive nodes before inserting."); // SR
+            Debug.Log("You must remove invasive nodes before inserting.");
             return null;
         }
+
         GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
         var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
         newBehavior.SetValue(value);
-        newBehavior.SetInvasive(false);
+        newBehavior.SetInvasive(false); // Dragged nodes are always healthy
 
         nodeObjects[value] = newNodeObj;
 
@@ -122,10 +125,13 @@ public class BSTManager : MonoBehaviour
         newNodeObj.transform.position = parentNode.transform.position + offset;
 
         parentNode.ConnectChild(newBehavior, isLeft);
-        nodesLeft = nodesLeft - 1; //SR
-        if (nodesLeft == 0) { // SR
-            currentPhase = GamePhase.Submission; // Makes so now you can submit SR
+        nodesLeft--;
+
+        if (nodesLeft == 0)
+        {
+            currentPhase = GamePhase.Submission;
         }
+
         return newNodeObj;
     }
 
@@ -193,54 +199,47 @@ public class BSTManager : MonoBehaviour
             scoreText.text = "Game Over!";
         }
     }
-    // Helper Function for AttemptDeleteNode (checks if all invasive nodes are gone)
-    private bool AnyInvasiveNodesRemaining() // SR
+
+    private bool AnyInvasiveNodesRemaining()
     {
-        foreach (var obj in nodeObjects.Values) { // SR
-            var behavior = obj.GetComponent<BSTNodeBehavior>(); // SR
-            if (behavior != null && behavior.isInvasive) //SR
-                return true; //SR
+        foreach (var obj in nodeObjects.Values)
+        {
+            var behavior = obj.GetComponent<BSTNodeBehavior>();
+            if (behavior != null && behavior.isInvasive)
+                return true;
         }
-        return false; //SR
+        return false;
     }
 
     public void AttemptDeleteNode(BSTNodeBehavior nodeBehavior)
     {
-        if (currentPhase != GamePhase.Deletion) //SR
+        if (currentPhase != GamePhase.Deletion)
         {
-            MessagePopup.instance.ShowMessage("Finish inserting!"); //SR
+            MessagePopup.instance.ShowMessage("Finish inserting!");
             return;
         }
+
         if (nodeBehavior.isInvasive)
         {
-            MessagePopup.instance.ShowMessage("Invasive node deleted!"); // ALL DEBUG MESSAGES NOW POPUP
+            MessagePopup.instance.ShowMessage("Invasive node deleted!");
 
             foreach (var obj in nodeObjects.Values)
             {
-                BSTNodeBehavior parent = obj.GetComponent<BSTNodeBehavior>();
-                if (parent != null)
-                {
-                    parent.DisconnectChild(nodeBehavior);
-                }
+                var parent = obj.GetComponent<BSTNodeBehavior>();
+                parent?.DisconnectChild(nodeBehavior);
             }
 
-            if (nodeObjects.ContainsKey(nodeBehavior.Value))
-            {
-                nodeObjects.Remove(nodeBehavior.Value);
-            }
-
+            nodeObjects.Remove(nodeBehavior.Value);
             root = DeleteRecursive(root, nodeBehavior.Value);
             Destroy(nodeBehavior.gameObject);
             UpdateTree();
 
-            if (SFXScript.instance != null)
+            SFXScript.instance?.PlayInsertSound();
+
+            if (!AnyInvasiveNodesRemaining())
             {
-                SFXScript.instance.PlayInsertSound();
-            }
-            if(!AnyInvasiveNodesRemaining()) //SR
-            { 
-                currentPhase = GamePhase.Insertion; //SR
-                MessagePopup.instance.ShowMessage("All invasive nodes removed! Now insert healthy nodes."); //SR
+                currentPhase = GamePhase.Insertion;
+                MessagePopup.instance.ShowMessage("All invasive nodes removed! Now insert healthy nodes.");
             }
         }
         else
@@ -248,10 +247,9 @@ public class BSTManager : MonoBehaviour
             MessagePopup.instance.ShowMessage("Healthy node deleted. You lost a life!");
             mistakeCount++;
             UpdateLives();
+
             if (mistakeCount >= maxMistakes)
-            {
                 MessagePopup.instance.ShowMessage("Game Over.");
-            }
         }
     }
 
@@ -276,30 +274,30 @@ public class BSTManager : MonoBehaviour
             node.Value = temp.Value;
             node.Right = DeleteRecursive(node.Right, temp.Value);
         }
+
         return node;
     }
 
     private BSTNode FindMin(BSTNode node)
     {
         while (node.Left != null)
-        {
             node = node.Left;
-        }
         return node;
     }
 
     public void OnSubmitTree()
     {
         Debug.Log("Submit button clicked!");
-        if (currentPhase != GamePhase.Submission) //SR
+        if (currentPhase != GamePhase.Submission)
         {
-            MessagePopup.instance.ShowMessage("Finish inserting before submitting."); //SR
+            MessagePopup.instance.ShowMessage("Finish inserting before submitting.");
             return;
         }
+
         if (IsValidBST(root, int.MinValue, int.MaxValue))
         {
             MessagePopup.instance.ShowMessage("Tree is valid! You saved the tree :)");
-            if (winScreen != null) winScreen.SetActive(true);
+            winScreen?.SetActive(true);
         }
         else
         {
@@ -320,20 +318,24 @@ public class BSTManager : MonoBehaviour
     public void ResetTree()
     {
         submitButton.interactable = false;
+
         foreach (var obj in nodeObjects.Values)
-        {
             Destroy(obj);
-        }
+
         nodeObjects.Clear();
         root = null;
         mistakeCount++;
         UpdateLives();
 
-        if (mistakeCount < maxMistakes) //SR
+        if (mistakeCount < maxMistakes)
         {
-            currentPhase = GamePhase.Deletion; //SR
-            foreach (var value in initialValues) //SR
-                Insert(value);
+            currentPhase = GamePhase.Deletion;
+            for (int i = 0; i < initialValues.Count; i++)
+            {
+                int value = initialValues[i];
+                bool isInvasive = (i < initialInvasiveFlags.Count) ? initialInvasiveFlags[i] : false;
+                Insert(value, isInvasive);
+            }
 
             UpdateTree();
         }

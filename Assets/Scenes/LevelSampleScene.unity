@@ -764,6 +764,7 @@ MonoBehaviour:
   scoreText: {fileID: 405533116}
   winScreen: {fileID: 0}
   initialValues: 08000000040000000a00000002000000060000000f000000
+  initialInvasiveFlags: 010100000100
   submitButton: {fileID: 121505284}
   nodeParent: {fileID: 0}
 --- !u!4 &517439664
