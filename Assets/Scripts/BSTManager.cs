@@ -1,11 +1,15 @@
 using UnityEngine;
+using UnityEngine.UI; //SR
 using TMPro;
 using System.Collections.Generic;
 
 public class BSTManager : MonoBehaviour
 {
     public static BSTManager instance;
-
+    // CREATION OF WIN STATE STARTS HERE V V
+    public enum GamePhase { Deletion, Insertion, Submission} // SR
+    public GamePhase currentPhase = GamePhase.Deletion; // SR
+    
     [SerializeField] public GameObject nodePrefab;
     [SerializeField] public Transform treeContainer;
     [SerializeField] private TMP_InputField inputField;
@@ -13,6 +17,7 @@ public class BSTManager : MonoBehaviour
     [SerializeField] private GameObject winScreen;
 
     [SerializeField] private List<int> initialValues; // Added this field to the inspector
+    [SerializeField] private Button submitButton; // SR
 
     public Transform nodeParent;
     public BSTNode root;
@@ -20,6 +25,7 @@ public class BSTManager : MonoBehaviour
 
     private int mistakeCount = 0;
     private int maxMistakes = 100;
+    private int nodesLeft = 2; //SR
 
     private void Awake()
     {
@@ -43,9 +49,15 @@ public class BSTManager : MonoBehaviour
 
     public void InsertFromUI()
     {
+        if (currentPhase != GamePhase.Insertion) { // Make sure all invasive nodes gone
+            Debug.Log("You must delete all invasive nodes first."); // SR
+            return; // SR
+        }
         if (int.TryParse(inputField.text, out int value))
         {
             Insert(value);
+            currentPhase = GamePhase.Submission; //SR Changes GamePhase to know be submission
+            submitButton.interactable = true;
             inputField.text = "";
         }
         else
@@ -94,10 +106,15 @@ public class BSTManager : MonoBehaviour
 
     public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
     {
+        if (currentPhase != GamePhase.Insertion) // SR
+        {
+            Debug.Log("You must remove invasive nodes before inserting."); // SR
+            return null;
+        }
         GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
         var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
         newBehavior.SetValue(value);
-        newBehavior.SetInvasive(Random.value < 0.4f);
+        newBehavior.SetInvasive(false);
 
         nodeObjects[value] = newNodeObj;
 
@@ -105,6 +122,10 @@ public class BSTManager : MonoBehaviour
         newNodeObj.transform.position = parentNode.transform.position + offset;
 
         parentNode.ConnectChild(newBehavior, isLeft);
+        nodesLeft = nodesLeft - 1; //SR
+        if (nodesLeft == 0) { // SR
+            currentPhase = GamePhase.Submission; // Makes so now you can submit SR
+        }
         return newNodeObj;
     }
 
@@ -172,12 +193,27 @@ public class BSTManager : MonoBehaviour
             scoreText.text = "Game Over!";
         }
     }
+    // Helper Function for AttemptDeleteNode (checks if all invasive nodes are gone)
+    private bool AnyInvasiveNodesRemaining() // SR
+    {
+        foreach (var obj in nodeObjects.Values) { // SR
+            var behavior = obj.GetComponent<BSTNodeBehavior>(); // SR
+            if (behavior != null && behavior.isInvasive) //SR
+                return true; //SR
+        }
+        return false; //SR
+    }
 
     public void AttemptDeleteNode(BSTNodeBehavior nodeBehavior)
     {
+        if (currentPhase != GamePhase.Deletion) //SR
+        {
+            MessagePopup.instance.ShowMessage("Finish inserting!"); //SR
+            return;
+        }
         if (nodeBehavior.isInvasive)
         {
-            Debug.Log("Invasive node deleted!");
+            MessagePopup.instance.ShowMessage("Invasive node deleted!"); // ALL DEBUG MESSAGES NOW POPUP
 
             foreach (var obj in nodeObjects.Values)
             {
@@ -201,15 +237,20 @@ public class BSTManager : MonoBehaviour
             {
                 SFXScript.instance.PlayInsertSound();
             }
+            if(!AnyInvasiveNodesRemaining()) //SR
+            { 
+                currentPhase = GamePhase.Insertion; //SR
+                MessagePopup.instance.ShowMessage("All invasive nodes removed! Now insert healthy nodes."); //SR
+            }
         }
         else
         {
-            Debug.Log("Healthy node deleted. Mistake made.");
+            MessagePopup.instance.ShowMessage("Healthy node deleted. You lost a life!");
             mistakeCount++;
             UpdateLives();
             if (mistakeCount >= maxMistakes)
             {
-                Debug.Log("Game Over.");
+                MessagePopup.instance.ShowMessage("Game Over.");
             }
         }
     }
@@ -249,14 +290,20 @@ public class BSTManager : MonoBehaviour
 
     public void OnSubmitTree()
     {
+        Debug.Log("Submit button clicked!");
+        if (currentPhase != GamePhase.Submission) //SR
+        {
+            MessagePopup.instance.ShowMessage("Finish inserting before submitting."); //SR
+            return;
+        }
         if (IsValidBST(root, int.MinValue, int.MaxValue))
         {
-            Debug.Log("Tree is valid!");
+            MessagePopup.instance.ShowMessage("Tree is valid! You saved the tree :)");
             if (winScreen != null) winScreen.SetActive(true);
         }
         else
         {
-            Debug.Log("Invalid BST. Resetting tree.");
+            MessagePopup.instance.ShowMessage("Invalid BST. Resetting tree.");
             ResetTree();
         }
     }
@@ -272,6 +319,7 @@ public class BSTManager : MonoBehaviour
 
     public void ResetTree()
     {
+        submitButton.interactable = false;
         foreach (var obj in nodeObjects.Values)
         {
             Destroy(obj);
@@ -280,5 +328,18 @@ public class BSTManager : MonoBehaviour
         root = null;
         mistakeCount++;
         UpdateLives();
+
+        if (mistakeCount < maxMistakes) //SR
+        {
+            currentPhase = GamePhase.Deletion; //SR
+            foreach (var value in initialValues) //SR
+                Insert(value);
+
+            UpdateTree();
+        }
+        else
+        {
+            MessagePopup.instance.ShowMessage("Game Over. No more lives.");
+        }
     }
 }

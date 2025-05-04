@@ -32,6 +32,12 @@ public class QueueItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
 public void OnBeginDrag(PointerEventData eventData)
 {
+    if (BSTManager.instance.currentPhase != BSTManager.GamePhase.Insertion) // SR
+    {
+        MessagePopup.instance.ShowMessage("You must delete all invasive nodes before inserting."); // SR
+        return; // Stop the drag
+    }
+
     canvasGroup.alpha = 0.5f; // Make it transparent
     canvasGroup.blocksRaycasts = false;
 
