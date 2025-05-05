@@ -2,27 +2,34 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class BSTNodeBehavior : MonoBehaviour, IDropHandler
+public class BSTNodeBehavior : MonoBehaviour
 {
     public int Value { get; private set; }
     private TMP_Text nodeText;
-    private SpriteRenderer spriteRenderer;
 
     public bool isInvasive = false;
     public Color normalColor = Color.white;
     public Color invasiveColor = Color.red;
-
     public GameObject targetObjectToColor;
 
+    
     private LineRenderer leftLine;
     private LineRenderer rightLine;
     public Transform leftChild;
     public Transform rightChild;
 
+    public GameObject leftDropZone;
+    public GameObject rightDropZone;
+
+    // Link to the logical BST node that represents this node in the data structure.
+    public BSTNode logicalNode;
+
     private void Awake()
     {
+        leftDropZone = transform.Find("LeftDropZone")?.gameObject;
+        rightDropZone = transform.Find("RightDropZone")?.gameObject;
+
         nodeText = GetComponentInChildren<TMP_Text>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
 
         Transform leftLineObj = transform.Find("LeftLine");
         Transform rightLineObj = transform.Find("RightLine");
@@ -32,13 +39,10 @@ public class BSTNodeBehavior : MonoBehaviour, IDropHandler
             leftLine = leftLineObj.GetComponent<LineRenderer>();
             rightLine = rightLineObj.GetComponent<LineRenderer>();
         }
-        else
-        {
-            Debug.LogError("LeftLine or RightLine child object is missing on BSTNodePrefab!");
-        }
 
         SetupLineRenderer(leftLine, Color.gray);
         SetupLineRenderer(rightLine, Color.gray);
+        ShowDropZones(false);
     }
 
     private void SetupLineRenderer(LineRenderer lr, Color color)
@@ -75,14 +79,6 @@ public class BSTNodeBehavior : MonoBehaviour, IDropHandler
             {
                 targetRenderer.color = invasive ? invasiveColor : normalColor;
             }
-            else
-            {
-                Debug.LogWarning("Target object to color missing SpriteRenderer!");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("No target object assigned to color.");
         }
     }
 
@@ -93,27 +89,14 @@ public class BSTNodeBehavior : MonoBehaviour, IDropHandler
         if (isLeft)
         {
             leftChild = child.transform;
-            leftLine.enabled = true;
+            if (leftLine != null) leftLine.enabled = true;
+            if (leftDropZone != null) leftDropZone.SetActive(false);
         }
         else
         {
             rightChild = child.transform;
-            rightLine.enabled = true;
-        }
-    }
-
-    private void Update()
-    {
-        if (leftChild != null && leftLine != null)
-        {
-            leftLine.SetPosition(0, transform.position);
-            leftLine.SetPosition(1, leftChild.position);
-        }
-
-        if (rightChild != null && rightLine != null)
-        {
-            rightLine.SetPosition(0, transform.position);
-            rightLine.SetPosition(1, rightChild.position);
+            if (rightLine != null) rightLine.enabled = true;
+            if (rightDropZone != null) rightDropZone.SetActive(false);
         }
     }
 
@@ -133,28 +116,29 @@ public class BSTNodeBehavior : MonoBehaviour, IDropHandler
         }
     }
 
-    private void OnMouseDown()
-{
-    BSTManager.instance.AttemptDeleteNode(this);
-}
-
-
-
-    public void OnDrop(PointerEventData eventData)
+    private void Update()
     {
-        var draggedItem = eventData.pointerDrag?.GetComponent<QueueItem>();
-        if (draggedItem != null)
+        if (leftChild != null && leftLine != null)
         {
-            // Insert the value at this node
-            BSTManager.instance.InsertAt(this, draggedItem.GetValue());
+            leftLine.SetPosition(0, transform.position);
+            leftLine.SetPosition(1, leftChild.position);
+        }
 
-            // Destroy dragged queue item
-            Destroy(draggedItem.gameObject);
-
-            QueueManager.instance.CheckLevelComplete();
+        if (rightChild != null && rightLine != null)
+        {
+            rightLine.SetPosition(0, transform.position);
+            rightLine.SetPosition(1, rightChild.position);
         }
     }
+
+    public void ShowDropZones(bool show)
+    {
+        if (leftDropZone != null) leftDropZone.SetActive(show);
+        if (rightDropZone != null) rightDropZone.SetActive(show);
+    }
+
+    private void OnMouseDown()
+    {
+        BSTManager.instance.AttemptDeleteNode(this);
+    }
 }
-
-
-

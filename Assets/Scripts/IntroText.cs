@@ -27,7 +27,6 @@ public class DialogueManager : MonoBehaviour
         {
             if (isTyping)
             {
-                // Skip typing and show full line
                 StopCoroutine(typingCoroutine);
                 dialogueText.text = lines[index];
                 isTyping = false;
