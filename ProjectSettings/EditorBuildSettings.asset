@@ -11,18 +11,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LevelSelect.unity
     guid: 2437380f29047481f9ccd015ccfeda2f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/Scenes/Level1.unity
-    guid: 7b9169949cf354a239d9ad1a5894c31f
+    guid: a0262602fd75848779e1a255a7ba7d1a
   - enabled: 1
     path: Assets/Scenes/Level2.unity
-    guid: 2fdfdf3c354bc4aa5bc5e13ffa74da9e
+    guid: cd67590b5bc7f4dbfaab3ecf7925416f
   - enabled: 1
     path: Assets/Scenes/Level3.unity
-    guid: 8eb1ee87e2cd14ec6b5241a64288e98a
+    guid: 784dc66ea771a4270b3b4450b5b31e19
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

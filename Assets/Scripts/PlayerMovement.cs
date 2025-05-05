@@ -4,29 +4,41 @@ public class PlayerMovement : MonoBehaviour
 {
     float horizontalInput;
     float moveSpeed = 5f;
-    bool isFacingRight = false;
+    bool isFacingRight = true;
     float jumpPower = 5f;
     bool isJumping = false;
+    public bool canMove = true;
+    public Sprite idleSprite;
+    public Sprite movingSprite;
+    
+    private SpriteRenderer sr;
 
     Rigidbody2D rb;
 
     // Start is called before the first frame update
     void Start()
     {
+        sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
+        if(canMove){
+            horizontalInput = Input.GetAxis("Horizontal");
+            if (Mathf.Abs(horizontalInput) > 0.1f)
+                sr.sprite = movingSprite;
+            else
+                sr.sprite = idleSprite;
 
-        FlipSprite();
+            FlipSprite();
 
-        if(Input.GetButtonDown("Jump") && !isJumping)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
-            isJumping = true;
+            if(Input.GetButtonDown("Jump") && !isJumping)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpPower);
+                isJumping = true;
+            }
         }
     }
 
