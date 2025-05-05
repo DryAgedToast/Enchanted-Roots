@@ -108,64 +108,86 @@ public class BSTManager : MonoBehaviour
     }
 
     // In the drag‐and‐drop insertion path, update the logical tree as well as the visual tree.
-    public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
+    
+public BSTNode FindNode(BSTNode node, int value)
+{
+    if (node == null)
+        return null;
+
+    if (node.Value == value)
+        return node;
+
+    BSTNode found = FindNode(node.Left, value);
+    if (found != null)
+        return found;
+
+    return FindNode(node.Right, value);
+}
+
+public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
+{
+    if (currentPhase != GamePhase.Insertion)
     {
-        if (currentPhase != GamePhase.Insertion)
-        {
-            Debug.Log("You must remove invasive nodes before inserting.");
-            return null;
-        }
-
-        if ((isLeft && parentNode.leftChild != null) || (!isLeft && parentNode.rightChild != null))
-        {
-            MessagePopup.instance.ShowMessage("This position is already occupied.");
-            return null;
-        }
-
-        if (nodeObjects.ContainsKey(value))
-        {
-            MessagePopup.instance.ShowMessage("This value has already been inserted.");
-            return null;
-        }
-
-        GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
-        var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
-        newBehavior.SetValue(value);
-        newBehavior.SetInvasive(false);
-
-        // Create a new logical node and associate it with the visual node.
-        BSTNode newLogicalNode = new BSTNode(value);
-        newLogicalNode.Behavior = newBehavior;
-        newBehavior.logicalNode = newLogicalNode;
-
-        // Update the parent's logical node: attach new node as left or right child.
-        if (parentNode.logicalNode == null)
-        {
-            // Create a new logical reference for parent if missing (should not happen normally).
-            parentNode.logicalNode = new BSTNode(parentNode.Value);
-        }
-        if (isLeft)
-            parentNode.logicalNode.Left = newLogicalNode;
-        else
-            parentNode.logicalNode.Right = newLogicalNode;
-
-        nodeObjects[value] = newNodeObj;
-
-        Vector3 offset = new Vector3(isLeft ? -1.5f : 1.5f, -1.5f, 0f);
-        newNodeObj.transform.position = parentNode.transform.position + offset;
-
-        parentNode.ConnectChild(newBehavior, isLeft);
-        nodesLeft--;
-
-        if (nodesLeft <= 0)
-        {
-            currentPhase = GamePhase.Submission;
-            submitButton.interactable = true;
-        }
-
-        UpdateTree(); // Rebuild visual connections based on updated logical tree.
-        return newNodeObj;
+        Debug.Log("You must remove invasive nodes before inserting.");
+        return null;
     }
+
+    if ((isLeft && parentNode.leftChild != null) || (!isLeft && parentNode.rightChild != null))
+    {
+        MessagePopup.instance.ShowMessage("This position is already occupied.");
+        return null;
+    }
+
+    if (nodeObjects.ContainsKey(value))
+    {
+        MessagePopup.instance.ShowMessage("This value has already been inserted.");
+        return null;
+    }
+
+    GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
+    var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
+    newBehavior.SetValue(value);
+    newBehavior.SetInvasive(false);
+
+    // Create a new logical node and associate it with the visual node.
+    BSTNode newLogicalNode = new BSTNode(value);
+    newLogicalNode.Behavior = newBehavior;
+    newBehavior.logicalNode = newLogicalNode;
+
+    // Find the parent's node in the logical tree (which starts at 'root').
+    BSTNode parentLogical = FindNode(root, parentNode.Value);
+    if (parentLogical == null)
+    {
+        Debug.LogError("Parent's logical node not found in the tree!");
+        return null;
+    }
+
+    // Update the parent's pointer according to the chosen side.
+    if (isLeft)
+        parentLogical.Left = newLogicalNode;
+    else
+        parentLogical.Right = newLogicalNode;
+
+    nodeObjects[value] = newNodeObj;
+
+    Vector3 offset = new Vector3(isLeft ? -1.5f : 1.5f, -1.5f, 0f);
+    newNodeObj.transform.position = parentNode.transform.position + offset;
+
+    parentNode.ConnectChild(newBehavior, isLeft);
+    nodesLeft--;
+
+    // If no additional nodes are to be inserted, change phase to Submission.
+    if (nodesLeft <= 0)
+    {
+        currentPhase = GamePhase.Submission;
+        submitButton.interactable = true;
+    }
+
+    // Update visual positions based on the updated logical tree.
+    UpdateTree();
+    return newNodeObj;
+}
+
 
     public void UpdateTree()
     {
@@ -319,13 +341,17 @@ public class BSTManager : MonoBehaviour
 }
 
 
-    private bool IsValidBST(BSTNode node, int min, int max)
+private bool IsValidBST(BSTNode node, int min, int max)
 {
     if (node == null)
         return true;
-
+    
+    Debug.Log($"Validating node {node.Value} in range ({min}, {max})");
     if (node.Value <= min || node.Value >= max)
+    {
+        Debug.Log($"Validation failed at node {node.Value}: not in ({min}, {max})");
         return false;
+    }
 
     return IsValidBST(node.Left, min, node.Value) && 
            IsValidBST(node.Right, node.Value, max);
