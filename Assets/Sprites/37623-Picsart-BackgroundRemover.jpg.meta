@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b3993a3528d9a4c18a68155b8e5a47b8
+guid: 46f350a391a274179a63d9d9dbbf9455
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3045542753197080145
-    second: pngimg.com - tree_PNG92768_0
+      213: -5414677889165092769
+    second: 37623-Picsart-BackgroundRemover_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pngimg.com - tree_PNG92768_0
+      name: 37623-Picsart-BackgroundRemover_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 468
-        height: 597
+        y: 29
+        width: 878
+        height: 109
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 15eb3908ff0f34a20800000000000000
-      internalID: 3045542753197080145
+      spriteID: f581723e5233bd4b0800000000000000
+      internalID: -5414677889165092769
       vertices: []
       indices: 
       edges: []
@@ -147,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      pngimg.com - tree_PNG92768_0: 3045542753197080145
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
