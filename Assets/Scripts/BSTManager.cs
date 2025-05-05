@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class BSTManager : MonoBehaviour
 {
@@ -328,6 +330,26 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
         return node;
     }
 
+    private IEnumerator WinAndLoadLevelSelect()
+{
+    yield return new WaitForSeconds(3f); // delay duration in seconds
+
+    if (SceneManager.GetActiveScene().name == "Level1" && LevelLock.levelComplete < 1)
+    {
+        LevelLock.levelComplete = 1;
+    }
+    else if (SceneManager.GetActiveScene().name == "Level2" && LevelLock.levelComplete < 2)
+    {
+        LevelLock.levelComplete = 2;
+    }
+    else if (SceneManager.GetActiveScene().name == "Level3" && LevelLock.levelComplete < 3)
+    {
+        LevelLock.levelComplete = 3;
+    }
+
+    SceneManager.LoadScene("LevelSelect");
+}
+
     public void OnSubmitTree()
 {
     Debug.Log("Submit button clicked!");
@@ -337,14 +359,16 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
         MessagePopup.instance.ShowMessage("Finish inserting before submitting.");
         return;
     }
-    
-    // Option 1: Validate the logical tree
+
     if (IsValidBST(root, int.MinValue, int.MaxValue))
     {
         MessagePopup.instance.ShowMessage("Tree is valid! You saved the tree :)");
         if (winScreen != null)
             winScreen.SetActive(true);
+
         ShowWinLosePopup(true);
+
+        StartCoroutine(WinAndLoadLevelSelect());
     }
     else
     {
@@ -352,7 +376,6 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
         ResetTree();
     }
 }
-
 
 private bool IsValidBST(BSTNode node, int min, int max)
 {

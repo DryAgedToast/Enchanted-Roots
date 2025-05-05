@@ -498,7 +498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab0c9812744d114ea890d2b3c33d724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelName: SampleScene_GlowNodes
+  LevelName: Level3
 --- !u!114 &267178970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1036,7 +1036,8 @@ Transform:
   m_LocalPosition: {x: -11.87, y: -0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 843561416}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!1 &843021418
@@ -1263,12 +1264,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 843561413}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 99.7, y: -0.2, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.000015258789, y: -111.570015, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 760229106}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!1 &882125115
 GameObject:
@@ -1362,6 +1363,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a310b9d592ac54efd95d25686e9d32b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level2Barrier: {fileID: 2005052212}
+  level3Barrier: {fileID: 733966438}
+  outsideBarrier: {fileID: 760229103}
 --- !u!1 &1064966352
 GameObject:
   m_ObjectHideFlags: 0
@@ -2009,7 +2013,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab0c9812744d114ea890d2b3c33d724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelName: SampleScene_GlowNodes
+  LevelName: Level2
 --- !u!114 &1351001672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2757,7 +2761,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab0c9812744d114ea890d2b3c33d724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelName: SampleScene_GlowNodes
+  LevelName: Level1
 --- !u!114 &1995311698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3268,8 +3272,7 @@ SceneRoots:
   - {fileID: 882125118}
   - {fileID: 1649829863}
   - {fileID: 1070240827}
-  - {fileID: 760229106}
   - {fileID: 2005052215}
   - {fileID: 733966441}
-  - {fileID: 843561416}
   - {fileID: 1851612985}
+  - {fileID: 760229106}

@@ -5,7 +5,7 @@ public class BSTVisualizer : MonoBehaviour
     public float xSpacing = 2.5f;
     public float ySpacing = 2.0f;
 
-    public void UpdatePositions(BSTNode root, float x = 0, float y = 0, int depth = 0)
+    public void UpdatePositions(BSTNode root, float x = 0, float y = 3, int depth = 0)
     {
         if (root == null) return;
 

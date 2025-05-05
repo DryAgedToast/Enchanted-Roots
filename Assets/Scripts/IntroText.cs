@@ -16,8 +16,12 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
-        dialogueText.text = "";
         playerMovement.canMove = false;
+        if(LevelLock.levelComplete > 0){
+            introBox.SetActive(false);
+            playerMovement.canMove = true;
+        }
+        dialogueText.text = "";
         typingCoroutine = StartCoroutine(TypeLine());
     }
 

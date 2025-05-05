@@ -8,8 +8,8 @@ public class BSTNodeBehavior : MonoBehaviour
     private TMP_Text nodeText;
 
     public bool isInvasive = false;
-    public Color normalColor = Color.white;
-    public Color invasiveColor = Color.red;
+    public Sprite normalSprite;
+    public Sprite invasiveSprite;
     public GameObject targetObjectToColor;
 
     
@@ -77,7 +77,14 @@ public class BSTNodeBehavior : MonoBehaviour
             SpriteRenderer targetRenderer = targetObjectToColor.GetComponent<SpriteRenderer>();
             if (targetRenderer != null)
             {
-                targetRenderer.color = invasive ? invasiveColor : normalColor;
+                if (invasive && invasiveSprite != null)
+                    {
+                        targetRenderer.sprite = invasiveSprite;
+                    }
+                    else if (!invasive && normalSprite != null)
+                    {
+                        targetRenderer.sprite = normalSprite;
+                    }
             }
         }
     }
