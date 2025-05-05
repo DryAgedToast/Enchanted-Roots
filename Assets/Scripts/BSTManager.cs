@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections.Generic;
 
 public class BSTManager : MonoBehaviour
 {
@@ -17,33 +17,34 @@ public class BSTManager : MonoBehaviour
     [SerializeField] private GameObject winScreen;
 
     [SerializeField] private List<int> initialValues;
-    [SerializeField] private List<bool> initialInvasiveFlags; // New: parallel to initialValues
+    [SerializeField] private List<bool> initialInvasiveFlags;
 
     [SerializeField] private Button submitButton;
 
-    public Transform nodeParent;
     public BSTNode root;
-    public Dictionary<int, GameObject> nodeObjects = new();
+    public Dictionary<int, GameObject> nodeObjects = new Dictionary<int, GameObject>();
 
     private int mistakeCount = 0;
     private int maxMistakes = 100;
-    private int nodesLeft = 2;
+    private int nodesLeft = 2; // For additional insertions
+
+    [SerializeField] private GameObject winLosePopupPrefab;
+    private GameObject activePopup;
 
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
-            Destroy(gameObject);
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
     }
 
     private void Start()
     {
+        // Create the initial BST nodes using the logical insertion routine.
         for (int i = 0; i < initialValues.Count; i++)
         {
             int value = initialValues[i];
             bool isInvasive = (i < initialInvasiveFlags.Count) ? initialInvasiveFlags[i] : false;
-            Insert(value, isInvasive);
+            root = InsertRecursive(root, value, isInvasive);
         }
 
         UpdateTree();
@@ -57,9 +58,10 @@ public class BSTManager : MonoBehaviour
             Debug.Log("You must delete all invasive nodes first.");
             return;
         }
+
         if (int.TryParse(inputField.text, out int value))
         {
-            Insert(value, false); // Always non-invasive from UI
+            Insert(value, false);
             currentPhase = GamePhase.Submission;
             submitButton.interactable = true;
             inputField.text = "";
@@ -75,12 +77,10 @@ public class BSTManager : MonoBehaviour
         root = InsertRecursive(root, value, isInvasive);
         UpdateTree();
 
-        if (SFXScript.instance != null)
-        {
-            SFXScript.instance.PlayInsertSound();
-        }
+        SFXScript.instance?.PlayInsertSound();
     }
 
+    // When inserting initially, create both a logical node and its visual
     private BSTNode InsertRecursive(BSTNode node, int value, bool isInvasive)
     {
         if (node == null)
@@ -90,22 +90,24 @@ public class BSTManager : MonoBehaviour
             nodeBehavior.SetValue(value);
             nodeBehavior.SetInvasive(isInvasive);
 
+            // Create the corresponding logical node and store a link to its visual component.
+            BSTNode newLogicalNode = new BSTNode(value, isInvasive);
+            newLogicalNode.Behavior = nodeBehavior;
+            nodeBehavior.logicalNode = newLogicalNode;
+
             nodeObjects[value] = newNode;
-            return new BSTNode(value);
+            return newLogicalNode;
         }
 
         if (value < node.Value)
-        {
             node.Left = InsertRecursive(node.Left, value, isInvasive);
-        }
         else
-        {
             node.Right = InsertRecursive(node.Right, value, isInvasive);
-        }
 
         return node;
     }
 
+    // In the drag‐and‐drop insertion path, update the logical tree as well as the visual tree.
     public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
     {
         if (currentPhase != GamePhase.Insertion)
@@ -114,10 +116,38 @@ public class BSTManager : MonoBehaviour
             return null;
         }
 
+        if ((isLeft && parentNode.leftChild != null) || (!isLeft && parentNode.rightChild != null))
+        {
+            MessagePopup.instance.ShowMessage("This position is already occupied.");
+            return null;
+        }
+
+        if (nodeObjects.ContainsKey(value))
+        {
+            MessagePopup.instance.ShowMessage("This value has already been inserted.");
+            return null;
+        }
+
         GameObject newNodeObj = Instantiate(nodePrefab, treeContainer);
         var newBehavior = newNodeObj.GetComponent<BSTNodeBehavior>();
         newBehavior.SetValue(value);
-        newBehavior.SetInvasive(false); // Dragged nodes are always healthy
+        newBehavior.SetInvasive(false);
+
+        // Create a new logical node and associate it with the visual node.
+        BSTNode newLogicalNode = new BSTNode(value);
+        newLogicalNode.Behavior = newBehavior;
+        newBehavior.logicalNode = newLogicalNode;
+
+        // Update the parent's logical node: attach new node as left or right child.
+        if (parentNode.logicalNode == null)
+        {
+            // Create a new logical reference for parent if missing (should not happen normally).
+            parentNode.logicalNode = new BSTNode(parentNode.Value);
+        }
+        if (isLeft)
+            parentNode.logicalNode.Left = newLogicalNode;
+        else
+            parentNode.logicalNode.Right = newLogicalNode;
 
         nodeObjects[value] = newNodeObj;
 
@@ -127,11 +157,13 @@ public class BSTManager : MonoBehaviour
         parentNode.ConnectChild(newBehavior, isLeft);
         nodesLeft--;
 
-        if (nodesLeft == 0)
+        if (nodesLeft <= 0)
         {
             currentPhase = GamePhase.Submission;
+            submitButton.interactable = true;
         }
 
+        UpdateTree(); // Rebuild visual connections based on updated logical tree.
         return newNodeObj;
     }
 
@@ -143,46 +175,34 @@ public class BSTManager : MonoBehaviour
 
     public void UpdateConnections()
     {
+        // First, reset all visual connections.
         foreach (var obj in nodeObjects.Values)
         {
             var behavior = obj.GetComponent<BSTNodeBehavior>();
-            if (behavior != null)
-            {
-                behavior.leftChild = null;
-                behavior.rightChild = null;
+            behavior.leftChild = null;
+            behavior.rightChild = null;
 
-                if (behavior.targetObjectToColor != null)
-                {
-                    LineRenderer lr = behavior.targetObjectToColor.GetComponent<LineRenderer>();
-                    if (lr != null)
-                    {
-                        lr.enabled = false;
-                    }
-                }
+            if (behavior.targetObjectToColor != null)
+            {
+                var lr = behavior.targetObjectToColor.GetComponent<LineRenderer>();
+                if (lr != null) lr.enabled = false;
             }
         }
-
         ConnectRecursive(root);
     }
 
+    // Walk the logical BST and update visual connections.
     private void ConnectRecursive(BSTNode node)
     {
-        if (node == null) return;
-        if (!nodeObjects.ContainsKey(node.Value)) return;
+        if (node == null || !nodeObjects.ContainsKey(node.Value)) return;
 
         var parentObj = nodeObjects[node.Value].GetComponent<BSTNodeBehavior>();
 
         if (node.Left != null && nodeObjects.ContainsKey(node.Left.Value))
-        {
-            var leftChildObj = nodeObjects[node.Left.Value].GetComponent<BSTNodeBehavior>();
-            parentObj.ConnectChild(leftChildObj, true);
-        }
+            parentObj.ConnectChild(nodeObjects[node.Left.Value].GetComponent<BSTNodeBehavior>(), true);
 
         if (node.Right != null && nodeObjects.ContainsKey(node.Right.Value))
-        {
-            var rightChildObj = nodeObjects[node.Right.Value].GetComponent<BSTNodeBehavior>();
-            parentObj.ConnectChild(rightChildObj, false);
-        }
+            parentObj.ConnectChild(nodeObjects[node.Right.Value].GetComponent<BSTNodeBehavior>(), false);
 
         ConnectRecursive(node.Left);
         ConnectRecursive(node.Right);
@@ -190,14 +210,9 @@ public class BSTManager : MonoBehaviour
 
     public void UpdateLives()
     {
-        if ((maxMistakes - mistakeCount) > 0)
-        {
-            scoreText.text = "Lives: " + (maxMistakes - mistakeCount);
-        }
-        else
-        {
-            scoreText.text = "Game Over!";
-        }
+        scoreText.text = (maxMistakes - mistakeCount) > 0
+            ? $"Lives: {maxMistakes - mistakeCount}"
+            : "Game Over!";
     }
 
     private bool AnyInvasiveNodesRemaining()
@@ -224,10 +239,7 @@ public class BSTManager : MonoBehaviour
             MessagePopup.instance.ShowMessage("Invasive node deleted!");
 
             foreach (var obj in nodeObjects.Values)
-            {
-                var parent = obj.GetComponent<BSTNodeBehavior>();
-                parent?.DisconnectChild(nodeBehavior);
-            }
+                obj.GetComponent<BSTNodeBehavior>()?.DisconnectChild(nodeBehavior);
 
             nodeObjects.Remove(nodeBehavior.Value);
             root = DeleteRecursive(root, nodeBehavior.Value);
@@ -258,13 +270,9 @@ public class BSTManager : MonoBehaviour
         if (node == null) return node;
 
         if (value < node.Value)
-        {
             node.Left = DeleteRecursive(node.Left, value);
-        }
         else if (value > node.Value)
-        {
             node.Right = DeleteRecursive(node.Right, value);
-        }
         else
         {
             if (node.Left == null) return node.Right;
@@ -286,62 +294,147 @@ public class BSTManager : MonoBehaviour
     }
 
     public void OnSubmitTree()
-    {
-        Debug.Log("Submit button clicked!");
-        if (currentPhase != GamePhase.Submission)
-        {
-            MessagePopup.instance.ShowMessage("Finish inserting before submitting.");
-            return;
-        }
+{
+    Debug.Log("Submit button clicked!");
 
-        if (IsValidBST(root, int.MinValue, int.MaxValue))
-        {
-            MessagePopup.instance.ShowMessage("Tree is valid! You saved the tree :)");
-            winScreen?.SetActive(true);
-        }
-        else
-        {
-            MessagePopup.instance.ShowMessage("Invalid BST. Resetting tree.");
-            ResetTree();
-        }
+    if (currentPhase != GamePhase.Submission)
+    {
+        MessagePopup.instance.ShowMessage("Finish inserting before submitting.");
+        return;
     }
+    
+    // Option 1: Validate the logical tree
+    if (IsValidBST(root, int.MinValue, int.MaxValue))
+    {
+        MessagePopup.instance.ShowMessage("Tree is valid! You saved the tree :)");
+        if (winScreen != null)
+            winScreen.SetActive(true);
+        ShowWinLosePopup(true);
+    }
+    else
+    {
+        MessagePopup.instance.ShowMessage("Invalid BST. Resetting tree.");
+        ResetTree();
+    }
+}
+
 
     private bool IsValidBST(BSTNode node, int min, int max)
+{
+    if (node == null)
+        return true;
+
+    if (node.Value <= min || node.Value >= max)
+        return false;
+
+    return IsValidBST(node.Left, min, node.Value) && 
+           IsValidBST(node.Right, node.Value, max);
+}
+
+
+    // Finds the root in the visual tree – a node with no parent.
+    private BSTNodeBehavior FindVisualRoot()
+    {
+        foreach (var obj in nodeObjects.Values)
+        {
+            var behavior = obj.GetComponent<BSTNodeBehavior>();
+            bool hasParent = false;
+
+            foreach (var otherObj in nodeObjects.Values)
+            {
+                var otherBehavior = otherObj.GetComponent<BSTNodeBehavior>();
+                if (otherBehavior != null && (otherBehavior.leftChild == behavior || otherBehavior.rightChild == behavior))
+                {
+                    hasParent = true;
+                    break;
+                }
+            }
+
+            if (!hasParent)
+                return behavior;
+        }
+
+        return null;
+    }
+
+    // Recursively validate the visual tree using the standard BST constraints.
+    private bool IsValidVisualBST(BSTNodeBehavior node, int min, int max)
     {
         if (node == null) return true;
-        if (node.Value <= min || node.Value >= max) return false;
 
-        return IsValidBST(node.Left, min, node.Value) &&
-               IsValidBST(node.Right, node.Value, max);
+        if (node.Value <= min || node.Value >= max)
+            return false;
+
+        BSTNodeBehavior leftBehavior = node.leftChild != null ? node.leftChild.GetComponent<BSTNodeBehavior>() : null;
+        BSTNodeBehavior rightBehavior = node.rightChild != null ? node.rightChild.GetComponent<BSTNodeBehavior>() : null;
+
+        return IsValidVisualBST(leftBehavior, min, node.Value) &&
+               IsValidVisualBST(rightBehavior, node.Value, max);
     }
 
     public void ResetTree()
+{
+    // Disable submit button while resetting.
+    submitButton.interactable = false;
+
+    // Destroy all current node GameObjects.
+    foreach (var obj in nodeObjects.Values)
     {
-        submitButton.interactable = false;
+        Destroy(obj);
+    }
+    nodeObjects.Clear();
+    root = null;
 
-        foreach (var obj in nodeObjects.Values)
-            Destroy(obj);
+    // Increment mistake count and update UI.
+    mistakeCount++;
+    UpdateLives();
 
-        nodeObjects.Clear();
-        root = null;
-        mistakeCount++;
-        UpdateLives();
+    // Reset the insertion queue.
+    QueueManager.instance.ResetQueue();
 
-        if (mistakeCount < maxMistakes)
-        {
-            currentPhase = GamePhase.Deletion;
-            for (int i = 0; i < initialValues.Count; i++)
-            {
-                int value = initialValues[i];
-                bool isInvasive = (i < initialInvasiveFlags.Count) ? initialInvasiveFlags[i] : false;
-                Insert(value, isInvasive);
-            }
+    // Reset the additional insertion counter.
+    nodesLeft = 2;  // (Adjust this value if needed for your game design.)
 
-            UpdateTree();
-        }
-        else
-        {
-            MessagePopup.instance.ShowMessage("Game Over. No more lives.");
-        }
+    // Rebuild the initial tree in "Deletion" phase so that the player can delete invasive nodes.
+    currentPhase = GamePhase.Deletion;
+    for (int i = 0; i < initialValues.Count; i++)
+    {
+        int value = initialValues[i];
+        bool isInvasive = (i < initialInvasiveFlags.Count) ? initialInvasiveFlags[i] : false;
+        root = InsertRecursive(root, value, isInvasive);
+    }
+    UpdateTree();
+
+    // Show a message that the tree has been reset.
+    MessagePopup.instance.ShowMessage("Tree reset. Delete invasive nodes before inserting healthy ones.");
+}
+
+
+
+
+    public void ShowWinLosePopup(bool won)
+    {
+        if (winLosePopupPrefab == null) return;
+
+        activePopup = Instantiate(winLosePopupPrefab, transform);
+        var popupScript = activePopup.GetComponent<WinLosePopup>();
+        popupScript?.Setup(won);
+    }
+}
+
+public class BSTNode
+{
+    public int Value;
+    public BSTNode Left;
+    public BSTNode Right;
+    public BSTNodeBehavior Behavior;  // Link to the visual component
+    public bool isInvasive;
+
+    public BSTNode(int value, bool isInvasive = false)
+    {
+        Value = value;
+        this.isInvasive = isInvasive;
+        Left = null;
+        Right = null;
     }
 }

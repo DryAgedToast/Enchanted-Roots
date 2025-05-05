@@ -12,6 +12,7 @@ public class BSTNodeBehavior : MonoBehaviour
     public Color invasiveColor = Color.red;
     public GameObject targetObjectToColor;
 
+    
     private LineRenderer leftLine;
     private LineRenderer rightLine;
     public Transform leftChild;
@@ -19,6 +20,9 @@ public class BSTNodeBehavior : MonoBehaviour
 
     public GameObject leftDropZone;
     public GameObject rightDropZone;
+
+    // Link to the logical BST node that represents this node in the data structure.
+    public BSTNode logicalNode;
 
     private void Awake()
     {
@@ -85,12 +89,14 @@ public class BSTNodeBehavior : MonoBehaviour
         if (isLeft)
         {
             leftChild = child.transform;
-            leftLine.enabled = true;
+            if (leftLine != null) leftLine.enabled = true;
+            if (leftDropZone != null) leftDropZone.SetActive(false);
         }
         else
         {
             rightChild = child.transform;
-            rightLine.enabled = true;
+            if (rightLine != null) rightLine.enabled = true;
+            if (rightDropZone != null) rightDropZone.SetActive(false);
         }
     }
 

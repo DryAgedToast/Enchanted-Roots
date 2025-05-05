@@ -1,16 +1,21 @@
-public class BSTNode
-{
-    //variables held for the node prefab
-    //value = value of the node (number)
-    //bstnode left and right; helps node keep track of what node is left and right of itself
-    public int Value;
-    public BSTNode Left;
-    public BSTNode Right;
+using UnityEngine;
 
-    public BSTNode(int value)
+namespace EnchantedRoots
+{
+    public class BSTNode
     {
-        Value = value;
-        Left = null;
-        Right = null;
+        public int Value;
+        public BSTNode Left;
+        public BSTNode Right;
+        public BSTNodeBehavior Behavior;  // Reference to the visual component
+        public bool isInvasive;
+
+        public BSTNode(int value, bool isInvasive = false)
+        {
+            Value = value;
+            this.isInvasive = isInvasive;
+            Left = null;
+            Right = null;
+        }
     }
 }
