@@ -10,6 +10,9 @@ public class DialogueManager : MonoBehaviour
     public PlayerMovement playerMovement;
     public GameObject introBox;
 
+    public AudioSource audioSource;         // Add this
+    public AudioClip characterBlipSound;    // And this
+
     private int index = 0;
     private bool isTyping = false;
     private Coroutine typingCoroutine;
@@ -17,7 +20,8 @@ public class DialogueManager : MonoBehaviour
     void Start()
     {
         playerMovement.canMove = false;
-        if(LevelLock.levelComplete > 0){
+        if (LevelLock.levelComplete > 0)
+        {
             introBox.SetActive(false);
             playerMovement.canMove = true;
         }
@@ -61,6 +65,13 @@ public class DialogueManager : MonoBehaviour
         foreach (char c in lines[index])
         {
             dialogueText.text += c;
+
+            // Only play sound for visible characters (not spaces, punctuation if desired)
+            if (!char.IsWhiteSpace(c) && audioSource && characterBlipSound)
+            {
+                audioSource.PlayOneShot(characterBlipSound, 0.6f); // volume can be tweaked
+            }
+
             yield return new WaitForSeconds(typingSpeed);
         }
 
