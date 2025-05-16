@@ -1860,7 +1860,7 @@ MonoBehaviour:
   - "I\u2019ll be fluttering nearby to help you out, no worries!"
   - "Now go on, cure those trees \u2014 I\u2019ll meet you at the first one!"
   - (Move with WASD or arrow keys. Click on trees to help them!)
-  typingSpeed: 0.05
+  typingSpeed: 0.02
   playerMovement: {fileID: 1621159803}
   introBox: {fileID: 1687828544}
 --- !u!114 &1232981121
