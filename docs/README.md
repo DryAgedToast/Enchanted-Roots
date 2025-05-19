@@ -1,7 +1,7 @@
 # Enchanted Roots
 
 ## Description of Game
-Enchanted Roots is a point and click game designed to teach the player how to analyze and traverse binary search trees using search, insert, and delete actions. 
+Enchanted Roots is an educational point and click game where you play as a cat navigating the mystical Enchanted Forest. With the help of a magical talking bee, players assist the trees against the infestation, exploring the fundamental concepts of Binary Search Trees (BSTs). Using intuitive point-and-click interactions, players learn to insert, search, and delete nodes from trees to restore balance to the forest. Enchanted Roots blends gentle music, whimsical storytelling, and structured computer science concepts into an accessible experience for learners of all levels.
 
 ## Developers
 - Max Mazal <maxmazal@udel.edu>
@@ -10,18 +10,20 @@ Enchanted Roots is a point and click game designed to teach the player how to an
 - Marc Madlangbayan <marcm@udel.edu>
 
 ## Basic Instructions
-*(Coming Soon)*
+- Click to delete red infested nodes.
+- Drag and drop pollinated nodes on highlighted spots below the tree's leaves (lowest nodes).
+- Click submit when all nodes have been inserted.
+- Traverse to the right when done with the trees.
 
 ## Screenshot
 *(Coming Soon)*
 
 ## Gameplay Video
-*(Coming Soon)*
+[*Gameplay*](http://drive.google.com/file/d/1JxuNIRiNBWCoB-U39tFbQXlEO080RFvV/view)
 
 ## Education Game Design Document  
 https://github.com/DryAgedToast/Enchanted-Roots/blob/main/docs/egdd.md
 
 ## Credits and Acknowledgements
-- [Wrong Node Sound](#) – Author: Lien from Sound Focus platform.
-- [Tapping on a Node Sound](#) – Author: Danasa Music from Sound Focus platform.
-- [Right Node Sound](#) – Author: V1-Rotate Beats from Sound Focus platform.
+- Artwork by Sophia Romero
+- Music and Sounds by Max Mazal
