@@ -55,6 +55,12 @@ public class DialogueManager : MonoBehaviour
                 }
             }
         }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            playerMovement.canMove = true;
+            enabled = false;
+            introBox.SetActive(false);
+        }
     }
 
     IEnumerator TypeLine()

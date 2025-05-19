@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using JetBrains.Annotations;
 
 public class BSTManager : MonoBehaviour
 {
@@ -31,7 +32,8 @@ public class BSTManager : MonoBehaviour
 
     private int mistakeCount = 0;
     private int maxMistakes = 3;
-    private int nodesLeft = 2; // For additional insertions
+    [SerializeField] private int nodesLeft; // For additional insertions
+    private int nodesAdd = 0;
 
     [SerializeField] private GameObject winLosePopupPrefab;
     private GameObject activePopup;
@@ -180,13 +182,14 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
 
     parentNode.ConnectChild(newBehavior, isLeft);
     nodesLeft--;
+    nodesAdd++;
 
     // If no additional nodes are to be inserted, change phase to Submission.
-    if (nodesLeft <= 0)
-    {
-        currentPhase = GamePhase.Submission;
-        submitButton.interactable = true;
-    }
+        if (nodesLeft <= 0)
+        {
+            currentPhase = GamePhase.Submission;
+            submitButton.interactable = true;
+        }
 
     // Update visual positions based on the updated logical tree.
     UpdateTree();
@@ -454,11 +457,12 @@ private bool IsValidBST(BSTNode node, int min, int max)
     // Reset the insertion queue.
     QueueManager.instance.ResetQueue();
 
-    // Reset the additional insertion counter.
-    nodesLeft = 2;  // (Adjust this value if needed for your game design.)
+        // Reset the additional insertion counter.
+    nodesLeft = nodesAdd;  // (Adjust this value if needed for your game design.)
+    nodesAdd = 0;
 
     // Rebuild the initial tree in "Deletion" phase so that the player can delete invasive nodes.
-    currentPhase = GamePhase.Deletion;
+        currentPhase = GamePhase.Deletion;
     for (int i = 0; i < initialValues.Count; i++)
     {
         int value = initialValues[i];

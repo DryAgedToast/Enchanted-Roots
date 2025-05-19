@@ -273,7 +273,7 @@ GameObject:
   - component: {fileID: 212144716}
   - component: {fileID: 212144715}
   - component: {fileID: 212144714}
-  - component: {fileID: 212144713}
+  - component: {fileID: 212144717}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -301,19 +301,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -250.4}
   m_SizeDelta: {x: 68.6, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &212144713
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 212144711}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ab0c9812744d114ea890d2b3c33d724, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LevelName: LevelSelect
 --- !u!114 &212144714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,7 +345,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 212144713}
+      - m_Target: {fileID: 212144717}
         m_TargetAssemblyTypeName: StartGame, Assembly-CSharp
         m_MethodName: LoadLevel
         m_Mode: 1
@@ -408,6 +395,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 212144711}
   m_CullTransparentMesh: 1
+--- !u!114 &212144717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212144711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa3d985fd53d4d6598dea0708b91671, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LevelName: LevelSelect
 --- !u!1 &275574397
 GameObject:
   m_ObjectHideFlags: 0

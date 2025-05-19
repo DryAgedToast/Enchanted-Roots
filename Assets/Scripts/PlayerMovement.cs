@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public Sprite movingSprite;
     
     private SpriteRenderer sr;
+    public static Vector3 spawnPosition;
 
     Rigidbody2D rb;
 
@@ -20,6 +21,7 @@ public class PlayerMovement : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        transform.position = spawnPosition;
     }
 
     // Update is called once per frame

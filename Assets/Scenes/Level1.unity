@@ -333,7 +333,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1946033020855465701, guid: 191f76949b9b343ad87f91d0d096474e, type: 3}
+  m_Sprite: {fileID: -205270267638800340, guid: 5bdaec8c535e2406ebc78127ed85277e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -711,6 +711,7 @@ MonoBehaviour:
   initialValues: 08000000040000000a00000002000000060000000f000000
   initialInvasiveFlags: 010100000100
   submitButton: {fileID: 316049401}
+  nodesLeft: 2
   winLosePopupPrefab: {fileID: 0}
 --- !u!4 &517439664
 Transform:
@@ -938,7 +939,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1946033020855465701, guid: 191f76949b9b343ad87f91d0d096474e, type: 3}
+  m_Sprite: {fileID: -205270267638800340, guid: 5bdaec8c535e2406ebc78127ed85277e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2567,7 +2568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcbab1e9b54afbc418c3672db77c3e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xSpacing: 1.4
+  xSpacing: 2
   ySpacing: 1.4
 --- !u!4 &1917260848
 Transform:
@@ -2868,7 +2869,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1946033020855465701, guid: 191f76949b9b343ad87f91d0d096474e, type: 3}
+  m_Sprite: {fileID: -205270267638800340, guid: 5bdaec8c535e2406ebc78127ed85277e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
