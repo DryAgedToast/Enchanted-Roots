@@ -16,9 +16,11 @@ Enchanted Roots is an educational point and click game where you play as a cat n
 - Traverse to the right when done with the trees.
 
 ## Screenshots
-[Inserting Node Screenshot](docs/screenshot1.png)
-[Opening Scene](docs/screenshot2.png)
-[Infested Tree Level](docs/screenshot3.png)
+[Inserting Node Screenshot](screenshot1.png)
+
+[Opening Scene](screenshot2.png)
+
+[Infested Tree Level](screenshot3.png)
 
 ## Gameplay Video
 [*Gameplay*](http://drive.google.com/file/d/1JxuNIRiNBWCoB-U39tFbQXlEO080RFvV/view)
