@@ -30,7 +30,7 @@ https://github.com/DryAgedToast/Enchanted-Roots/blob/main/docs/egdd.md
 
 ## Links
 - [Slideshow](https://docs.google.com/presentation/d/1XbaycbLARi3gK050tusD6Jl2aK4rnizFzljNQEVS_Zw/edit?usp=sharing)
-- [Deployed Game URL] (edit this!)
+- [Deployed Game URL](https://dryagedtoast.github.io/Enchanted-Roots/)
 
 ## Credits and Acknowledgements
 - Artwork by Sophia Romero
