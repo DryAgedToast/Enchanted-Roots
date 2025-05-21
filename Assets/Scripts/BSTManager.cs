@@ -242,9 +242,12 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
     {
         if ((maxMistakes - mistakeCount) > 0)
         {
-            if(mistakeCount == 1){
+            if (mistakeCount == 1)
+            {
                 Heart3.SetActive(false);
-            } else if(mistakeCount == 2){
+            }
+            else if (mistakeCount == 2)
+            {
                 Heart2.SetActive(false);
             }
         }
@@ -252,6 +255,7 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
         {
             Heart1.SetActive(false);
             scoreText.text = "Game Over!";
+            SceneManager.LoadScene("LevelSelect");
         }
     }
 
@@ -299,9 +303,6 @@ public GameObject InsertAt(BSTNodeBehavior parentNode, int value, bool isLeft)
             MessagePopup.instance.ShowMessage("Healthy node deleted. You lost a life!");
             mistakeCount++;
             UpdateLives();
-
-            if (mistakeCount >= maxMistakes)
-                MessagePopup.instance.ShowMessage("Game Over.");
         }
     }
 

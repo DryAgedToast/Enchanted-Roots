@@ -15,12 +15,13 @@ public class DialogueManager : MonoBehaviour
 
     private int index = 0;
     private bool isTyping = false;
+    private static bool DoneOnce = false;
     private Coroutine typingCoroutine;
 
     void Start()
     {
         playerMovement.canMove = false;
-        if (LevelLock.levelComplete > 0)
+        if (LevelLock.levelComplete > 0 || DoneOnce)
         {
             introBox.SetActive(false);
             playerMovement.canMove = true;
@@ -52,6 +53,7 @@ public class DialogueManager : MonoBehaviour
                     playerMovement.canMove = true;
                     enabled = false;
                     introBox.SetActive(false);
+                    DoneOnce = true;
                 }
             }
         }
@@ -60,6 +62,7 @@ public class DialogueManager : MonoBehaviour
             playerMovement.canMove = true;
             enabled = false;
             introBox.SetActive(false);
+            DoneOnce = true;
         }
     }
 
