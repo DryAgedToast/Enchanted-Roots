@@ -10,6 +10,8 @@ Enchanted Roots is an educational point and click game where you play as a cat n
 - Marc Madlangbayan <marcm@udel.edu>
 
 ## Basic Instructions
+- In the forest, move left and right with A and D or left and right arrows.
+- Click on tree to select level.
 - Click to delete red infested nodes.
 - Drag and drop pollinated nodes on highlighted spots below the tree's leaves (lowest nodes).
 - Click submit when all nodes have been inserted.
