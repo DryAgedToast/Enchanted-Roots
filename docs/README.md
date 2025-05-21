@@ -28,6 +28,10 @@ Enchanted Roots is an educational point and click game where you play as a cat n
 ## Education Game Design Document  
 https://github.com/DryAgedToast/Enchanted-Roots/blob/main/docs/egdd.md
 
+## Links
+[Slideshow](https://docs.google.com/presentation/d/1XbaycbLARi3gK050tusD6Jl2aK4rnizFzljNQEVS_Zw/edit?usp=sharing)
+[Deployed Game URL](edit this!)
+
 ## Credits and Acknowledgements
 - Artwork by Sophia Romero
 - Music and Sounds by Max Mazal
